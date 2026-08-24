@@ -1,6 +1,8 @@
 # Sistema de Botica
 
 [![License: Proprietary](https://img.shields.io/badge/license-proprietary-red.svg)](LICENSE)
+[![PHP](https://img.shields.io/badge/PHP-8.0%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
+[![MySQL](https://img.shields.io/badge/MySQL-5.7%2B-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
 
 ERP/POS para boticas y farmacias: catálogo de medicamentos, proveedores, compras con lotes FEFO, punto de venta, caja, inventario físico, reportes y auditoría.
 
