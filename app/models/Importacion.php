@@ -61,12 +61,15 @@ class Importacion {
 
     // Genera el contenido CSV (con BOM UTF-8 para Excel) de la plantilla de una entidad:
     // encabezados exactos + una fila de ejemplo orientativa que el usuario debe reemplazar.
+    // Se usa ';' como delimitador (no ',') porque es el separador de listas que Excel en
+    // configuración regional español espera para repartir el CSV en columnas al abrirlo con
+    // doble clic, sin pasar por el asistente de "Texto en columnas".
     public function generarPlantillaCsv($config) {
         $columnas = array_keys($config['columnas']);
 
         $out = fopen('php://temp', 'w+');
         fwrite($out, "\xEF\xBB\xBF");
-        fputcsv($out, $columnas);
+        fputcsv($out, $columnas, ';');
 
         $ejemplo = array_map(function ($col) use ($config) {
             $r = $config['columnas'][$col];
@@ -77,7 +80,7 @@ class Importacion {
             if (($r['tipo'] ?? null) === 'fecha') return date('Y-m-d');
             return 'Ejemplo';
         }, $columnas);
-        fputcsv($out, $ejemplo);
+        fputcsv($out, $ejemplo, ';');
 
         rewind($out);
         $contenido = stream_get_contents($out);
