@@ -1,0 +1,10 @@
+# Backups de base de datos: snapshots generados durante tareas de mantenimiento,
+# no deben versionarse (pueden contener datos reales y crecen con cada backup).
+*backup*.sql
+bk_*.sql
+
+# Archivos de sistema operativo / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
