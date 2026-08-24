@@ -1,5 +1,7 @@
 # Sistema de Botica
 
+[![License: Proprietary](https://img.shields.io/badge/license-proprietary-red.svg)](LICENSE)
+
 ERP/POS para boticas y farmacias: catálogo de medicamentos, proveedores, compras con lotes FEFO, punto de venta, caja, inventario físico, reportes y auditoría.
 
 **Stack:** PHP MVC nativo (sin framework) + MySQL/MariaDB + Bootstrap 5 + Chart.js.
@@ -89,3 +91,7 @@ Credenciales por defecto (creadas por `botica_db.sql`):
 
 - [`MANUAL_DE_USUARIO.md`](MANUAL_DE_USUARIO.md) — guía de uso de cada módulo.
 - [`REPORTE_SEGURIDAD.md`](REPORTE_SEGURIDAD.md) — auditoría de seguridad y hallazgos corregidos.
+
+## Licencia
+
+Software propietario. Todos los derechos reservados — ver [`LICENSE`](LICENSE).
