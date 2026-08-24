@@ -67,4 +67,66 @@ class ConfiguracionController extends Controller {
         header('Location: ' . BASE_URL . 'configuracion/index');
         exit;
     }
+
+    // "Restablecer a Estado de Fábrica". Acceso ya restringido a Administrador por el
+    // constructor de este controlador. Requiere reverificar la contraseña del propio
+    // usuario en sesión y escribir literalmente "RESTABLECER" antes de tocar la BD.
+    public function reset() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . 'configuracion/index');
+            exit;
+        }
+        $this->verifyCsrf();
+
+        $password = $_POST['password_actual'] ?? '';
+        $confirmacion = trim($_POST['confirmacion'] ?? '');
+        $opcion = $_POST['opcion_reset'] ?? '';
+
+        $userModel = $this->model('User');
+        $usuarioActual = $userModel->getById($_SESSION['user_id']);
+
+        if (!$usuarioActual || !password_verify($password, $usuarioActual['password'])) {
+            $this->flash('error', "La contraseña ingresada no es correcta. No se realizó ningún cambio.");
+            header('Location: ' . BASE_URL . 'configuracion/index');
+            exit;
+        }
+
+        if ($confirmacion !== 'RESTABLECER') {
+            $this->flash('error', "Debes escribir exactamente la palabra 'RESTABLECER' para confirmar. No se realizó ningún cambio.");
+            header('Location: ' . BASE_URL . 'configuracion/index');
+            exit;
+        }
+
+        if (!in_array($opcion, ['total', 'transacciones'], true)) {
+            $this->flash('error', "Debes seleccionar una opción de limpieza válida.");
+            header('Location: ' . BASE_URL . 'configuracion/index');
+            exit;
+        }
+
+        $resetModel = $this->model('SistemaReset');
+        $exito = $resetModel->ejecutar($opcion);
+
+        if (!$exito) {
+            $this->flash('error', "Ocurrió un error al restablecer el sistema. La operación fue revertida por completo; no se perdió ningún dato.");
+            header('Location: ' . BASE_URL . 'configuracion/index');
+            exit;
+        }
+
+        $descripcion = $opcion === 'total'
+            ? "Restablecimiento TOTAL del sistema a estado de fábrica (catálogos y transacciones eliminados)."
+            : "Limpieza de transacciones del sistema (catálogos preservados).";
+        $this->logAccion('Configuracion', 'RESET_SISTEMA', $descripcion);
+
+        // Cerramos la sesión actual de forma segura y abrimos una nueva, vacía, solo
+        // para poder entregar el mensaje de éxito vía el sistema global de flash() en
+        // la pantalla de login (auth/login.php no usa el layout principal, así que
+        // incluye su propio partials/flash.php).
+        $_SESSION = [];
+        session_destroy();
+        session_start();
+        $this->flash('success', "El sistema fue restablecido correctamente. Por favor, inicia sesión nuevamente.");
+
+        header('Location: ' . BASE_URL . 'auth/login');
+        exit;
+    }
 }

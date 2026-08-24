@@ -173,6 +173,61 @@ $logo_url = !empty($c['logo']['valor']) ? $c['logo']['valor'] : BASE_URL . 'img/
             </button>
         </div>
     </form>
+
+    <?php if(($_SESSION['rol_id'] ?? null) == 1): ?>
+    <!-- Zona de Peligro: Restablecer a Estado de Fábrica -->
+    <div class="settings-card mt-4" style="border: 2px solid var(--danger);">
+        <h5 style="color: var(--danger); font-size: 16px; margin-bottom: 10px; font-weight:700;">
+            <i class="bi bi-exclamation-octagon-fill"></i> Zona de Peligro — Restablecer a Estado de Fábrica
+        </h5>
+        <p style="color: var(--text-secondary); font-size: 13px;">
+            Esta acción elimina datos reales de la base de datos de forma <strong>permanente e irreversible</strong>.
+            Al finalizar se cerrará tu sesión automáticamente y deberás iniciar sesión de nuevo.
+        </p>
+
+        <form action="<?php echo BASE_URL; ?>configuracion/reset" method="POST" id="formReset"
+              onsubmit="return confirm('Esta acción eliminará datos de forma PERMANENTE y no se puede deshacer.\n\n¿Estás completamente seguro de continuar?');">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+
+            <div class="mb-3">
+                <label class="form-label" style="color: var(--text-primary); font-weight:600;">Selecciona el tipo de limpieza</label>
+
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="opcion_reset" id="optTotal" value="total" required>
+                    <label class="form-check-label" for="optTotal" style="color: var(--text-primary);">
+                        <strong>Limpieza Total para Producción</strong><br>
+                        <small style="color: var(--text-secondary);">Elimina ventas, historial de caja, kardex, compras, clientes, proveedores y productos. Deja únicamente al usuario Administrador principal y los catálogos base limpios (categorías y laboratorios vacíos).</small>
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="opcion_reset" id="optTransacciones" value="transacciones" required>
+                    <label class="form-check-label" for="optTransacciones" style="color: var(--text-primary);">
+                        <strong>Limpiar Transacciones y Mantener Catálogos</strong><br>
+                        <small style="color: var(--text-secondary);">Vacía solo el historial operativo: ventas, compras, caja, kardex y devoluciones. Mantiene intacto el catálogo de productos, categorías, laboratorios, clientes y proveedores.</small>
+                    </label>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" style="color: var(--text-primary);">Tu contraseña actual <span class="text-danger">*</span></label>
+                    <input type="password" name="password_actual" class="form-control" required autocomplete="current-password">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" style="color: var(--text-primary);">Escribe <strong>RESTABLECER</strong> para confirmar <span class="text-danger">*</span></label>
+                    <input type="text" name="confirmacion" id="inConfirmacion" class="form-control" required autocomplete="off" placeholder="RESTABLECER">
+                </div>
+            </div>
+
+            <div class="text-end mt-3">
+                <button type="submit" id="btnReset" class="btn btn-danger" disabled>
+                    <i class="bi bi-radioactive"></i> Restablecer Sistema
+                </button>
+            </div>
+        </form>
+    </div>
+    <?php endif; ?>
 </div>
 
 <script>
@@ -187,4 +242,11 @@ document.getElementById('fileLogo').addEventListener('change', function(e) {
         reader.readAsDataURL(e.target.files[0]);
     }
 });
+
+var inConfirmacion = document.getElementById('inConfirmacion');
+if (inConfirmacion) {
+    inConfirmacion.addEventListener('input', function() {
+        document.getElementById('btnReset').disabled = (this.value !== 'RESTABLECER');
+    });
+}
 </script>

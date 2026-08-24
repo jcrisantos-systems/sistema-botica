@@ -23,6 +23,8 @@
     <div class="login-title">Bienvenido de nuevo 👋</div>
     <div class="login-subtitle">Inicia sesión con tus credenciales para continuar.</div>
 
+    <?php require_once '../app/views/partials/flash.php'; ?>
+
     <?php if (!empty($data['error'])): ?>
         <div class="alert-danger">
             <i class="bi bi-exclamation-triangle"></i> <?php echo htmlspecialchars($data['error'], ENT_QUOTES, 'UTF-8'); ?>
