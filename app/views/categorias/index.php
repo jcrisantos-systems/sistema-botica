@@ -33,9 +33,12 @@
                             <button class="btn btn-sm" style="color: #00CFE8;" onclick="editarRegistro(<?php echo htmlspecialchars(json_encode($cat)); ?>)">
                                 <i class="bi bi-pencil-square"></i>
                             </button>
-                            <a href="<?php echo BASE_URL; ?>categoria/delete/<?php echo $cat['id']; ?>" class="btn btn-sm" style="color: var(--danger);" onclick="return confirm('¿Seguro que deseas eliminar esta categoría?')">
-                                <i class="bi bi-trash"></i>
-                            </a>
+                            <form action="<?php echo BASE_URL; ?>categoria/delete/<?php echo $cat['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar esta categoría?');">
+                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <button type="submit" class="btn btn-sm" style="color: var(--danger);">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -51,6 +54,7 @@
   <div class="modal-dialog">
     <div class="modal-content" style="background-color: var(--bg-card); border: 1px solid var(--border-color);">
       <form action="<?php echo BASE_URL; ?>categoria/save" method="POST">
+          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
           <input type="hidden" name="id" id="txtId">
           <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
             <h5 class="modal-title" id="modalTitle" style="color: var(--text-primary); font-size: 16px; font-weight:700;">Nueva Categoría</h5>

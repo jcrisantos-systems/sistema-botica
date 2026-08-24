@@ -17,18 +17,25 @@ class LaboratorioController extends Controller {
             $this->verifyCsrf();
             $modelo = $this->model('Laboratorio');
             $data = [
-                'nombre' => $_POST['nombre'],
-                'descripcion' => $_POST['descripcion'],
+                'nombre' => trim($_POST['nombre']),
+                'descripcion' => trim($_POST['descripcion'] ?? ''),
                 'id' => $_POST['id'] ?? null
             ];
-            
-            if (empty($data['id'])) {
-                $modelo->create($data);
-            } else {
-                $modelo->update($data);
+
+            try {
+                if (empty($data['id'])) {
+                    $modelo->create($data);
+                    $this->flash('success', "Laboratorio creado exitosamente.");
+                } else {
+                    $modelo->update($data);
+                    $this->flash('success', "Laboratorio actualizado exitosamente.");
+                }
+            } catch (PDOException $e) {
+                $this->flash('error', $this->handleDbException($e, ['nombre' => 'nombre de laboratorio']));
             }
         }
         header('Location: ' . BASE_URL . 'laboratorio/index');
+        exit;
     }
 
     public function delete($id) {
@@ -36,8 +43,14 @@ class LaboratorioController extends Controller {
         $this->verifyCsrf();
 
         $modelo = $this->model('Laboratorio');
-        $modelo->delete($id);
+        try {
+            $modelo->delete($id);
+            $this->flash('success', "Laboratorio eliminado correctamente.");
+        } catch (PDOException $e) {
+            $this->flash('error', $this->handleDbException($e));
+        }
 
         header('Location: ' . BASE_URL . 'laboratorio/index');
+        exit;
     }
 }

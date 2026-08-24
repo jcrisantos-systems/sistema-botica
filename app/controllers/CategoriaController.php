@@ -17,18 +17,25 @@ class CategoriaController extends Controller {
             $this->verifyCsrf();
             $modelo = $this->model('Categoria');
             $data = [
-                'nombre' => $_POST['nombre'],
-                'descripcion' => $_POST['descripcion'],
+                'nombre' => trim($_POST['nombre']),
+                'descripcion' => trim($_POST['descripcion'] ?? ''),
                 'id' => $_POST['id'] ?? null
             ];
-            
-            if (empty($data['id'])) {
-                $modelo->create($data);
-            } else {
-                $modelo->update($data);
+
+            try {
+                if (empty($data['id'])) {
+                    $modelo->create($data);
+                    $this->flash('success', "Categoría creada exitosamente.");
+                } else {
+                    $modelo->update($data);
+                    $this->flash('success', "Categoría actualizada exitosamente.");
+                }
+            } catch (PDOException $e) {
+                $this->flash('error', $this->handleDbException($e, ['nombre' => 'nombre de categoría']));
             }
         }
         header('Location: ' . BASE_URL . 'categoria/index');
+        exit;
     }
 
     public function delete($id) {
@@ -36,8 +43,14 @@ class CategoriaController extends Controller {
         $this->verifyCsrf();
 
         $modelo = $this->model('Categoria');
-        $modelo->delete($id);
+        try {
+            $modelo->delete($id);
+            $this->flash('success', "Categoría eliminada correctamente.");
+        } catch (PDOException $e) {
+            $this->flash('error', $this->handleDbException($e));
+        }
 
         header('Location: ' . BASE_URL . 'categoria/index');
+        exit;
     }
 }
