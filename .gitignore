@@ -3,6 +3,11 @@
 *backup*.sql
 bk_*.sql
 
+# Archivos temporales del módulo de Importación Masiva (CSV subidos en proceso de
+# validación; se borran solos al confirmar o cancelar, no deben versionarse)
+storage/imports/*
+!storage/imports/.gitkeep
+
 # Archivos de sistema operativo / editor
 .DS_Store
 Thumbs.db

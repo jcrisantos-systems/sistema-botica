@@ -80,7 +80,12 @@
                     <i class="bi bi-people"></i> Clientes
                 </a>
             </li>
-            
+            <li class="nav-item">
+                <a href="<?php echo BASE_URL; ?>importacion/index" class="nav-link">
+                    <i class="bi bi-cloud-upload-fill"></i> Importación Masiva
+                </a>
+            </li>
+
             <?php if($_SESSION['rol_id'] == 1): ?>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menuProductos" role="button" aria-expanded="false" aria-controls="menuProductos">
