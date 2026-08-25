@@ -46,7 +46,7 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2" style="width:24px; height:24px; font-size:10px;">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width:24px; height:24px; font-size:10px; background-color: var(--accent-primary); color: #fff; font-weight:700;">
                                             <?php echo strtoupper(substr($acc['username'], 0, 1)); ?>
                                         </div>
                                         <span><?php echo htmlspecialchars($acc['nombres']); ?></span>
