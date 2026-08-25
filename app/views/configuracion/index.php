@@ -218,11 +218,11 @@ $logo_url = !empty($c['logo']['valor']) ? $c['logo']['valor'] : BASE_URL . 'img/
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label" style="color: var(--text-primary);">Tu contraseña actual <span class="text-danger">*</span></label>
-                    <input type="password" name="password_actual" class="form-control" required autocomplete="current-password">
+                    <input type="password" name="password_actual" class="form-control-custom" required autocomplete="current-password">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label" style="color: var(--text-primary);">Escribe <strong>RESTABLECER</strong> para confirmar <span class="text-danger">*</span></label>
-                    <input type="text" name="confirmacion" id="inConfirmacion" class="form-control" required autocomplete="off" placeholder="RESTABLECER">
+                    <input type="text" name="confirmacion" id="inConfirmacion" class="form-control-custom" required autocomplete="off" placeholder="RESTABLECER">
                 </div>
             </div>
 
@@ -242,7 +242,7 @@ document.getElementById('fileLogo').addEventListener('change', function(e) {
         var reader = new FileReader();
         reader.onload = function(e) {
             document.getElementById('imgPreview').src = e.target.result;
-            document.getElementById('logoContainer').style.borderColor = "#fff";
+            document.getElementById('logoContainer').style.borderColor = "var(--success)";
             setTimeout(() => { document.getElementById('logoContainer').style.borderColor = "var(--accent-primary)"; }, 300);
         }
         reader.readAsDataURL(e.target.files[0]);
