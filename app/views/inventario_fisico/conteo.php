@@ -9,7 +9,7 @@
         </a>
     </div>
 
-    <div class="alert alert-info border-info" style="background: rgba(13, 202, 240, 0.1); color: #0dcaf0;">
+    <div class="alert alert-info border-info" style="background: rgba(13, 202, 240, 0.12); color: #0369A1;">
         <i class="bi bi-info-circle-fill"></i> <strong>Instrucciones:</strong> Ingrese la cantidad real que observa físicamente para cada lote. El sistema calculará la diferencia y ajustará el inventario automáticamente al presionar "Finalizar".
     </div>
 

@@ -22,12 +22,12 @@ $logo_url = !empty($c['logo']['valor']) ? $c['logo']['valor'] : BASE_URL . 'img/
     margin: 0 auto 20px;
     overflow: hidden;
     position: relative;
-    background: rgba(0,0,0,0.3);
+    background: var(--bg-dark);
     cursor: pointer;
     transition: all 0.3s;
 }
 .logo-preview-container:hover {
-    background: rgba(30, 215, 96, 0.1);
+    background: var(--accent-light);
 }
 .logo-preview-container img {
     max-width: 100%;
@@ -77,7 +77,7 @@ $logo_url = !empty($c['logo']['valor']) ? $c['logo']['valor'] : BASE_URL . 'img/
             <!-- Izquierda: Branding Logo -->
             <div class="col-md-4">
                 <div class="settings-card text-center">
-                    <h5 style="color: #fff; font-size: 16px; margin-bottom: 30px;">Identidad Visual</h5>
+                    <h5 class="section-title" style="justify-content:center; margin-bottom: 30px;">Identidad Visual</h5>
                     
                     <label for="fileLogo" style="width: 100%; cursor: pointer;">
                         <div class="logo-preview-container" id="logoContainer">
@@ -100,7 +100,7 @@ $logo_url = !empty($c['logo']['valor']) ? $c['logo']['valor'] : BASE_URL . 'img/
             <!-- Derecha: Datos Legales -->
             <div class="col-md-8">
                 <div class="settings-card">
-                    <h5 style="color: #fff; font-size: 16px; margin-bottom: 25px;"><i class="bi bi-building"></i> Información Fiscal y Comercial</h5>
+                    <h5 class="section-title"><i class="bi bi-building"></i> Información Fiscal y Comercial</h5>
                     
                     <div class="row g-3">
                         <div class="col-md-12 form-group">
@@ -140,7 +140,7 @@ $logo_url = !empty($c['logo']['valor']) ? $c['logo']['valor'] : BASE_URL . 'img/
                         </div>
                     </div>
 
-                    <h5 style="color: #fff; font-size: 16px; margin-top: 35px; margin-bottom: 25px;"><i class="bi bi-cash-coin"></i> Valores Financieros Base</h5>
+                    <h5 class="section-title" style="margin-top: 35px;"><i class="bi bi-cash-coin"></i> Valores Financieros Base</h5>
                     
                     <div class="row g-3">
                         <div class="col-md-6 form-group">

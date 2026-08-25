@@ -36,7 +36,7 @@
                                     ?>
                                     <tr>
                                         <td style="color:var(--text-primary); font-size:13px;"><?php echo htmlspecialchars($l['producto']); ?></td>
-                                        <td style="font-size:12px; color:#aaa;"><?php echo htmlspecialchars($l['lote']); ?></td>
+                                        <td style="font-size:12px; color:var(--text-secondary);"><?php echo htmlspecialchars($l['lote']); ?></td>
                                         <td style="<?php echo $color; ?> font-weight:bold; font-size:12px;">
                                             <?php echo date('d/m/Y', strtotime($l['fecha_vencimiento'])); ?><br>
                                             <small>(<?php echo $isVencido ? 'VENCIDO' : "En $diff días"; ?>)</small>
@@ -73,7 +73,7 @@
                                     <?php foreach($data['bajos'] as $b): ?>
                                     <tr>
                                         <td style="color:var(--text-primary); font-size:13px;"><?php echo htmlspecialchars($b['producto']); ?></td>
-                                        <td style="font-size:12px; color:#aaa;"><?php echo htmlspecialchars($b['unidad_medida']); ?></td>
+                                        <td style="font-size:12px; color:var(--text-secondary);"><?php echo htmlspecialchars($b['unidad_medida']); ?></td>
                                         <td class="text-end font-weight-bold" style="<?php echo $b['stock'] <= 5 ? 'color:var(--danger);' : 'color:var(--warning);'; ?>">
                                             <?php echo $b['stock']; ?>
                                         </td>

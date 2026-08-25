@@ -9,7 +9,7 @@
         </a>
     </div>
 
-    <div class="alert alert-warning border-warning" style="background: rgba(255, 193, 7, 0.1); color: #ffc107;">
+    <div class="alert alert-warning border-warning" style="background: var(--warning-bg); color: var(--warning);">
         <i class="bi bi-exclamation-triangle-fill"></i> <strong>Importante:</strong> Ingrese los datos de los lotes y fechas de vencimiento tal como figuran en el empaque físico. Al confirmar, los productos se cargarán al stock inmediatamente.
     </div>
 
@@ -32,7 +32,7 @@
                         <?php foreach($data['detalles'] as $det): ?>
                         <tr>
                             <td>
-                                <strong style="color: #fff;"><?php echo htmlspecialchars($det['nombre_comercial']); ?></strong>
+                                <strong style="color: var(--text-primary);"><?php echo htmlspecialchars($det['nombre_comercial']); ?></strong>
                                 <input type="hidden" name="detalle_id[]" value="<?php echo $det['id']; ?>">
                             </td>
                             <td class="text-center" style="font-size: 16px; font-weight: bold;">

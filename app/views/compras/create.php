@@ -15,7 +15,7 @@
         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
         <!-- CABECERA -->
         <div class="card-metric mb-4">
-            <h5 style="color: #fff; font-size: 16px; margin-bottom: 20px;">Datos del Documento y Proveedor</h5>
+            <h5 class="section-title">Datos del Documento y Proveedor</h5>
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Proveedor <span class="text-danger">*</span></label>
@@ -68,7 +68,7 @@
         <!-- DETALLE MULTILINEA -->
         <div class="card-metric mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 style="color: #fff; font-size: 16px; margin: 0;">Detalle de Productos a Ingresar (Lotes)</h5>
+                <h5 class="section-title" style="margin: 0; padding-bottom: 0; border-bottom: none;">Detalle de Productos a Ingresar (Lotes)</h5>
                 <button type="button" class="btn btn-sm" style="background-color: var(--success-bg); color: var(--accent-primary); border:none;" onclick="agregarFila()">
                     <i class="bi bi-plus-circle"></i> Añadir Ítem
                 </button>
@@ -109,7 +109,7 @@
                         <input type="hidden" name="impuesto" id="fiIgv" value="0.00">
                     </div>
                     <div class="d-flex justify-content-between">
-                        <span style="color: #fff; font-size: 18px; font-weight: 700;">Total Compra:</span>
+                        <span style="color: var(--text-primary); font-size: 18px; font-weight: 700;">Total Compra:</span>
                         <span style="font-weight: 700; font-size: 18px; color: var(--accent-primary);" id="spTotalGlobal">S/ 0.00</span>
                         <input type="hidden" name="total_compra" id="fiTotal" value="0">
                     </div>
@@ -169,7 +169,7 @@ function agregarFila() {
         <td><input type="date" class="form-control-custom" name="vencimiento[]" required></td>
         <td><input type="number" class="form-control-custom fila-cant" name="cantidad[]" value="1" min="1" oninput="calcularFila(${rowIndex})" required></td>
         <td><input type="number" class="form-control-custom fila-precio" name="precio_c_unitario[]" step="0.01" value="0.00" oninput="calcularFila(${rowIndex})" required></td>
-        <td><input type="number" class="form-control-custom fila-subtotal bg-dark text-white border-0" name="subtotal[]" value="0.00" readonly></td>
+        <td><input type="number" class="form-control-custom fila-subtotal border-0" style="background-color: var(--bg-dark); color: var(--text-primary); font-weight:700;" name="subtotal[]" value="0.00" readonly></td>
         <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="quitarFila(${rowIndex})"><i class="bi bi-trash"></i></button></td>
     `;
     document.getElementById('tbodyDetalles').appendChild(tr);

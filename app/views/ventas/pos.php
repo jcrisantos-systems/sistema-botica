@@ -8,20 +8,20 @@ body { overflow-x: hidden; }
 .pos-totals { background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color); padding: 20px; margin-top: 15px; }
 
 /* Carrito Table */
-.tr-cart { border-bottom: 1px solid rgba(255,255,255,0.05); }
+.tr-cart { border-bottom: 1px solid var(--border-color); }
 .tr-cart td { padding: 12px 5px; vertical-align: middle; }
-.qty-btn { background: #e9ecef; color: #222; border: 1px solid #ced4da; border-radius: 5px; width: 30px; height: 30px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; font-weight: bold; font-size: 18px; }
+.qty-btn { background: var(--bg-dark); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 5px; width: 30px; height: 30px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; font-weight: bold; font-size: 18px; }
 .qty-btn:hover { background: var(--accent-primary); color: #fff; border-color: var(--accent-primary); }
-.qty-input { width: 50px; text-align: center; background: transparent; border: none; color: #222; font-weight: bold;}
+.qty-input { width: 50px; text-align: center; background: transparent; border: none; color: var(--text-primary); font-weight: bold;}
 
 /* Pay Button */
-.btn-pay { background: linear-gradient(135deg, var(--accent-primary) 0%, #1FA95B 100%); width: 100%; color: #000; font-weight: 800; font-size: 22px; padding: 20px; border-radius: 12px; border: none; cursor: pointer; transition: transform 0.2s; }
+.btn-pay { background: linear-gradient(135deg, var(--accent-primary) 0%, var(--success) 100%); width: 100%; color: #fff; font-weight: 800; font-size: 22px; padding: 20px; border-radius: 12px; border: none; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 15px var(--accent-light); }
 .btn-pay:hover { transform: translateY(-2px); }
 
 /* Catalogo Buscar */
 .pos-catalog { flex-grow: 1; overflow-y: auto; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color); padding: 15px; }
-.item-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
-.item-card:hover { border-color: var(--accent-primary); background: rgba(40, 199, 111, 0.05); }
+.item-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
+.item-card:hover { border-color: var(--accent-primary); background: var(--accent-light); }
 .item-card.disabled { opacity: 0.5; pointer-events: none; }
 </style>
 
@@ -98,15 +98,15 @@ body { overflow-x: hidden; }
                             <div class="col-6">
                                 <label class="form-label mb-0" style="color:var(--text-secondary); font-size:12px;">Efectivo Recibido</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-dark border-secondary text-white">S/</span>
-                                    <input type="number" step="0.01" class="form-control bg-dark border-secondary text-white fw-bold" name="pago_recibido" id="inPago" placeholder="0.00" oninput="calcularVuelto()">
+                                    <span class="input-group-text" style="background-color: var(--bg-dark); border-color: var(--border-color); color: var(--text-primary);">S/</span>
+                                    <input type="number" step="0.01" class="form-control fw-bold" style="background-color: var(--bg-dark); border-color: var(--border-color); color: var(--text-primary);" name="pago_recibido" id="inPago" placeholder="0.00" oninput="calcularVuelto()">
                                 </div>
                             </div>
                             <div class="col-6">
                                 <label class="form-label mb-0" style="color:var(--text-secondary); font-size:12px;">Vuelto</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-dark border-secondary text-white">S/</span>
-                                    <input type="number" class="form-control bg-dark border-secondary text-warning fw-bold" name="vuelto_venta" id="inVuelto" value="0.00" readonly>
+                                    <span class="input-group-text" style="background-color: var(--bg-dark); border-color: var(--border-color); color: var(--text-primary);">S/</span>
+                                    <input type="number" class="form-control fw-bold text-warning" style="background-color: var(--bg-dark); border-color: var(--border-color);" name="vuelto_venta" id="inVuelto" value="0.00" readonly>
                                 </div>
                             </div>
                         </div>
@@ -114,7 +114,7 @@ body { overflow-x: hidden; }
                         <!-- Bloque CMP Oculto -->
                         <div id="cmpBlock" class="mt-3" style="display:none; background: rgba(220, 53, 69, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(220, 53, 69, 0.5);">
                             <label class="form-label mb-0" style="color:var(--danger); font-size:13px; font-weight:bold;"><i class="bi bi-file-medical"></i> CMP Médico (Requerido para controlados)</label>
-                            <input type="text" class="form-control bg-dark border-danger text-white mt-1" name="medico_cmp" id="inCmp" placeholder="Ej. 12345">
+                            <input type="text" class="form-control border-danger mt-1" style="background-color: var(--bg-dark); color: var(--text-primary);" name="medico_cmp" id="inCmp" placeholder="Ej. 12345">
                         </div>
                     </div>
                     
@@ -411,11 +411,11 @@ function renderCarrito() {
             sum += subtotal;
 
             let comboUnidad = item.fraccionable == 1 
-                ? `<select class="bg-dark text-white border-0 py-1 rounded" style="font-size:11px;" onchange="cambiarUnidad(${item.id}, this.value)">
+                ? `<select class="border-0 py-1 rounded" style="font-size:11px; background-color: var(--bg-dark); color: var(--text-primary);" onchange="cambiarUnidad(${item.id}, this.value)">
                     <option value="CAJA" ${item.tipo_unidad == 'CAJA' ? 'selected' : ''}>${item.unidad_medida}</option>
                     <option value="FRACCION" ${item.tipo_unidad == 'FRACCION' ? 'selected' : ''}>${item.unidad_fraccion}</option>
                    </select>` 
-                : `<span style="font-size:11px; color:#aaa;">${item.unidad_medida}</span>`;
+                : `<span style="font-size:11px; color:var(--text-secondary);">${item.unidad_medida}</span>`;
             
             // Fila Visual
             tbody.innerHTML += `

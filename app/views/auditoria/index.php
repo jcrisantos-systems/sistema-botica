@@ -12,12 +12,12 @@
     <!-- TABS NAVIGATION -->
     <ul class="nav nav-tabs border-secondary mb-4" id="auditTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active text-white" id="acciones-tab" data-bs-toggle="tab" data-bs-target="#acciones" type="button" role="tab" style="background: transparent; border-bottom: 2px solid var(--accent-primary);">
+            <button class="nav-link active" id="acciones-tab" data-bs-toggle="tab" data-bs-target="#acciones" type="button" role="tab">
                 <i class="bi bi-activity"></i> Registro de Actividad
             </button>
         </li>
         <li class="nav-item" role="presentation" style="margin-left: 10px;">
-            <button class="nav-link text-white" id="accesos-tab" data-bs-toggle="tab" data-bs-target="#accesos" type="button" role="tab" style="background: transparent;">
+            <button class="nav-link" id="accesos-tab" data-bs-toggle="tab" data-bs-target="#accesos" type="button" role="tab">
                 <i class="bi bi-shield-lock"></i> Control de Accesos
             </button>
         </li>
@@ -64,7 +64,7 @@
                                     ?>
                                     <span class="badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars($acc['accion'], ENT_QUOTES, 'UTF-8'); ?></span>
                                 </td>
-                                <td class="text-white" style="font-size: 13px;">
+                                <td style="font-size: 13px; color: var(--text-primary);">
                                     <?php echo htmlspecialchars($acc['descripcion']); ?>
                                 </td>
                             </tr>

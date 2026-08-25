@@ -29,11 +29,11 @@
                     <?php else: ?>
                     <?php foreach($data['compras'] as $compra): ?>
                     <tr>
-                        <td style="color:#A0A0A0; font-family:monospace;">
+                        <td style="color:var(--text-secondary); font-family:monospace;">
                             #C-<?php echo str_pad($compra['id'], 5, '0', STR_PAD_LEFT); ?><br>
                             <small class="text-muted"><i class="bi bi-person"></i> <?php echo explode(' ', $compra['cajero'])[0]; ?></small>
                         </td>
-                        <td style="font-weight:600; color:#fff;">
+                        <td style="font-weight:600; color:var(--text-primary);">
                             <?php echo htmlspecialchars($compra['proveedor']); ?>
                         </td>
                         <td>

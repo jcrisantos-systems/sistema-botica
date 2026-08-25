@@ -55,7 +55,7 @@
                                 <?php foreach($data['detalles'] as $i => $det): ?>
                                 <tr>
                                     <td>
-                                        <strong style="color:#fff;"><?php echo htmlspecialchars($det['nombre_comercial']); ?></strong><br>
+                                        <strong style="color:var(--text-primary);"><?php echo htmlspecialchars($det['nombre_comercial']); ?></strong><br>
                                         <small class="text-muted">Lote: <?php echo htmlspecialchars($det['codigo_lote']); ?> | Vence: <?php echo date('d/m/Y', strtotime($det['fecha_vencimiento'])); ?></small>
                                         <input type="hidden" name="producto_id[]" value="<?php echo $det['id_producto']; ?>">
                                         <input type="hidden" name="lote_id[]" value="<?php echo $det['id_lote']; ?>">

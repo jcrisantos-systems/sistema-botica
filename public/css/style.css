@@ -1,25 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    /* Fondo limpio general */
-    --bg-dark: #F4F7F6;
+    /* Fondo limpio general (gris pizarra muy claro, no blanco puro) */
+    --bg-dark: #F1F5F9;
     /* Fondo de paneles */
     --bg-card: #FFFFFF;
-    /* Textos nítidos pero no negros puros para evitar fatiga */
-    --text-primary: #2C3E50;
-    --text-secondary: #7F8C8D;
-    /* Acento Botica: Turquesa Médico */
-    --accent-primary: #00A896;
-    --accent-hover: #028090;
-    --accent-light: rgba(0, 168, 150, 0.1);
-    /* Otros */
-    --success: #02C39A;
-    --success-bg: rgba(2, 195, 154, 0.1);
-    --danger: #E63946;
-    --danger-bg: rgba(230, 57, 70, 0.1);
-    --warning: #F4A261;
+    /* Textos: gris pizarra oscuro para máxima legibilidad, sin ser negro puro */
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    /* Acento de marca: Verde Esmeralda corporativo */
+    --accent-primary: #059669;
+    --accent-hover: #047857;
+    --accent-light: rgba(5, 150, 105, 0.10);
+    /* Estados */
+    --success: #10B981;
+    --success-bg: rgba(16, 185, 129, 0.10);
+    --danger: #DC2626;
+    --danger-bg: rgba(220, 38, 38, 0.08);
+    --warning: #D97706;
+    --warning-bg: rgba(217, 119, 6, 0.10);
     --border-color: #E2E8F0;
+
+    --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.07);
+    --shadow-lg: 0 20px 48px rgba(15, 23, 42, 0.12);
 }
+
+* { box-sizing: border-box; }
 
 body {
     font-family: 'Inter', sans-serif;
@@ -44,30 +51,32 @@ body {
 
 /* Sidebar flotante claro */
 #sidebar {
-    width: 260px;
+    width: 264px;
     background-color: var(--bg-card);
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    padding: 20px 0;
+    padding: 22px 0;
     flex-shrink: 0;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.02);
+    box-shadow: var(--shadow-sm);
     z-index: 10;
 }
 
 .sidebar-logo {
     display: flex;
     align-items: center;
-    padding: 0 20px 30px;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--accent-primary);
+    justify-content: center;
+    padding: 0 20px 28px;
+    font-size: 21px;
+    font-weight: 800;
+    color: var(--text-primary);
     text-decoration: none;
     gap: 12px;
+    letter-spacing: -0.3px;
 }
 
 .sidebar-logo i {
-    font-size: 28px;
+    font-size: 26px;
     background: linear-gradient(135deg, var(--accent-primary) 0%, var(--success) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -81,22 +90,22 @@ body {
     overflow-y: auto;
 }
 
-.nav-item { margin-bottom: 8px; }
+.nav-item { margin-bottom: 4px; }
 
 .nav-link {
     display: flex;
     align-items: center;
-    padding: 12px 18px;
+    padding: 11px 16px;
     color: var(--text-secondary);
     text-decoration: none;
     border-radius: 10px;
     font-weight: 500;
     font-size: 14px;
-    transition: all 0.3s ease;
-    gap: 14px;
+    transition: all 0.2s ease;
+    gap: 13px;
 }
 
-.nav-link i { font-size: 20px; width: 22px; text-align: center; transition: color 0.3s; }
+.nav-link i { font-size: 18px; width: 20px; text-align: center; transition: color 0.2s; }
 
 .nav-link:hover {
     background-color: var(--accent-light);
@@ -109,14 +118,15 @@ body {
 .nav-link.active {
     background-color: var(--accent-primary);
     color: #fff;
-    box-shadow: 0 4px 10px var(--accent-light);
+    font-weight: 600;
+    box-shadow: 0 4px 12px var(--accent-light);
 }
 
 .nav-link.active-pos {
     background: linear-gradient(135deg, var(--accent-primary) 0%, var(--success) 100%);
     color: #fff;
     font-weight: 700;
-    box-shadow: 0 4px 15px rgba(2, 195, 154, 0.3);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
     border: none;
 }
 
@@ -143,14 +153,14 @@ body {
 
 /* Top Navbar limpio */
 #topbar {
-    height: 75px;
+    height: 72px;
     padding: 0 30px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     background-color: var(--bg-card);
     border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    box-shadow: var(--shadow-sm);
     z-index: 5;
 }
 
@@ -171,8 +181,8 @@ body {
     transition: border 0.3s, box-shadow 0.3s;
 }
 
-.search-box input:focus { 
-    border-color: var(--accent-primary); 
+.search-box input:focus {
+    border-color: var(--accent-primary);
     background-color: var(--bg-card);
     box-shadow: 0 0 0 4px var(--accent-light);
 }
@@ -216,8 +226,8 @@ body {
 .user-profile:hover { background-color: var(--bg-dark); }
 
 .user-profile img {
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     object-fit: cover;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -228,88 +238,258 @@ body {
 .user-role { font-size: 12px; color: var(--text-secondary); font-weight: 500;}
 
 /* Main Padding */
-.page-content { padding: 35px; }
+.page-content { padding: 32px 35px 40px; }
 .page-header { margin-bottom: 30px; }
-.page-title { font-size: 26px; font-weight: 700; color: var(--text-primary); margin: 0; letter-spacing: -0.5px;}
-.page-subtitle { font-size: 15px; color: var(--text-secondary); margin-top: 5px;}
+.page-title { font-size: 25px; font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.5px;}
+.page-subtitle { font-size: 14px; color: var(--text-secondary); margin-top: 5px;}
 
-/* Cards Estilo Médico/Salud (Planas, blancas, sombras tenues) */
+/* Cards corporativas: planas, blancas, sombras suaves, bordes redondeados */
 .card-metric {
     background-color: var(--bg-card);
-    border-radius: 20px;
+    border-radius: 16px;
     padding: 24px;
-    border: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.card-metric:hover { 
-    transform: translateY(-5px); 
-    box-shadow: 0 10px 25px rgba(0, 168, 150, 0.1); 
+.card-metric:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
 }
 
 .metric-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-.metric-title { font-size: 15px; color: var(--text-secondary); font-weight: 600; }
-.metric-icon { 
-    width: 48px; height: 48px; 
-    border-radius: 12px; 
-    display: flex; align-items: center; justify-content: center; 
-    font-size: 24px; 
-    background-color: var(--accent-light); 
-    color: var(--accent-primary); 
+.metric-title { font-size: 14px; color: var(--text-secondary); font-weight: 600; }
+.metric-icon {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    background-color: var(--accent-light);
+    color: var(--accent-primary);
 }
-.metric-value { font-size: 32px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); letter-spacing: -1px;}
+.metric-value { font-size: 30px; font-weight: 800; margin-bottom: 8px; color: var(--text-primary); letter-spacing: -1px;}
 .metric-trend { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 5px;}
 .trend-up { color: var(--success); background-color: var(--success-bg); padding: 4px 8px; border-radius: 20px;}
 .trend-down { color: var(--danger); background-color: var(--danger-bg); padding: 4px 8px; border-radius: 20px;}
 
-/* Login Page Only - Split modern design */
+/* Encabezado de sección dentro de una tarjeta (reemplaza títulos hardcodeados en blanco) */
+.section-title {
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.section-title i { color: var(--accent-primary); }
+
+/* Tablas corporativas (usadas como .table-custom en listados e importaciones) */
+.table-custom {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+}
+.table-custom thead th {
+    background: var(--bg-dark);
+    color: var(--text-secondary);
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 13px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+.table-custom thead th:first-child { border-top-left-radius: 10px; }
+.table-custom thead th:last-child { border-top-right-radius: 10px; }
+.table-custom tbody td {
+    padding: 13px 16px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+.table-custom tbody tr:last-child td { border-bottom: none; }
+.table-custom tbody tr:hover { background: var(--accent-light); }
+
+/* Pestañas (tabs) con contraste garantizado en cualquier fondo claro */
+.nav-tabs { border-bottom: 1px solid var(--border-color); gap: 4px; }
+.nav-tabs .nav-link {
+    color: var(--text-secondary) !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 8px 8px 0 0 !important;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 16px;
+    transition: color 0.2s;
+}
+.nav-tabs .nav-link:hover { color: var(--accent-primary) !important; background: var(--accent-light) !important; }
+.nav-tabs .nav-link.active {
+    color: var(--accent-primary) !important;
+    border-bottom: 2px solid var(--accent-primary) !important;
+}
+
+/* Modales: fuerza legibilidad consistente sobre fondo claro */
+.modal-content { border-radius: 16px; border: 1px solid var(--border-color); }
+.modal-header, .modal-footer { border-color: var(--border-color) !important; }
+.modal-title { color: var(--text-primary); font-weight: 700; }
+
+/* ============ LOGIN — Diseño premium en dos paneles ============ */
 .login-body {
-    background-color: #f0f4f8; /* Soft blueish background */
+    background-color: var(--bg-dark);
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.login-shell {
+    display: flex;
+    height: 100vh;
+}
+
+/* Panel izquierdo: marca / propuesta de valor (oculto en pantallas pequeñas) */
+.login-visual {
+    flex: 0 0 46%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 56px 60px;
+    background: linear-gradient(155deg, #064E3B 0%, #059669 55%, #10B981 100%);
+    color: #fff;
+    overflow: hidden;
+}
+
+.login-visual::before {
+    content: '';
+    position: absolute;
+    width: 480px; height: 480px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    top: -160px; right: -160px;
+}
+.login-visual::after {
+    content: '';
+    position: absolute;
+    width: 360px; height: 360px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    bottom: -140px; left: -100px;
+}
+
+.login-visual-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: 800;
+    position: relative;
+    z-index: 1;
+}
+.login-visual-brand i { font-size: 26px; }
+
+.login-visual-main { position: relative; z-index: 1; max-width: 420px; }
+.login-visual-main h1 {
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.5px;
+    margin: 0 0 18px;
+}
+.login-visual-main p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.login-visual-features {
+    list-style: none;
+    padding: 0;
+    margin: 28px 0 0;
+    position: relative;
+    z-index: 1;
+}
+.login-visual-features li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.92);
+    margin-bottom: 14px;
+}
+.login-visual-features i {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.login-visual-footer {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.65);
+    position: relative;
+    z-index: 1;
+}
+
+/* Panel derecho: formulario */
+.login-form-panel {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-    background-image: radial-gradient(circle at top right, var(--accent-light), transparent 40%), radial-gradient(circle at bottom left, rgba(2, 195, 154,0.1), transparent 40%);
+    background-color: var(--bg-card);
+    padding: 40px 24px;
+    overflow-y: auto;
 }
 
 .login-card {
-    background-color: var(--bg-card);
     width: 100%;
-    max-width: 460px;
-    padding: 50px 40px;
-    border-radius: 24px;
+    max-width: 400px;
+    padding: 0;
+    border-radius: 0;
     border: none;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    box-shadow: none;
+    background-color: transparent;
 }
 
-.login-logo { text-align: center; margin-bottom: 35px; font-size: 32px; font-weight: 800; color: var(--text-primary); }
-.login-logo i { color: var(--accent-primary); font-size: 40px; display: block; margin-bottom: 10px;}
-.login-title { font-size: 22px; margin-bottom: 10px; font-weight: 700; text-align: center; color: var(--text-primary);}
-.login-subtitle { font-size: 15px; color: var(--text-secondary); margin-bottom: 35px; text-align: center;}
+.login-logo { text-align: left; margin-bottom: 8px; font-size: 22px; font-weight: 800; color: var(--text-primary); display: none; }
+.login-logo i { color: var(--accent-primary); font-size: 30px; display: block; margin-bottom: 10px;}
+.login-title { font-size: 26px; margin-bottom: 8px; font-weight: 800; text-align: left; color: var(--text-primary); letter-spacing: -0.5px;}
+.login-subtitle { font-size: 14.5px; color: var(--text-secondary); margin-bottom: 32px; text-align: left;}
 
-.form-group { margin-bottom: 22px; }
-.form-label { display: block; font-size: 14px; color: var(--text-primary); margin-bottom: 8px; font-weight: 600; }
-.form-control-custom { 
-    width: 100%; padding: 14px 18px; 
-    border-radius: 12px; background-color: #F8FAFC; 
-    border: 1px solid var(--border-color); color: var(--text-primary); 
-    font-family: 'Inter'; transition: all 0.3s; font-size: 15px;
+.form-group { margin-bottom: 20px; }
+.form-label { display: block; font-size: 13.5px; color: var(--text-primary); margin-bottom: 8px; font-weight: 600; }
+.form-control-custom {
+    width: 100%; padding: 13px 16px;
+    border-radius: 10px; background-color: #F8FAFC;
+    border: 1px solid var(--border-color); color: var(--text-primary);
+    font-family: 'Inter'; transition: all 0.2s; font-size: 14.5px;
 }
-.form-control-custom:focus { 
-    border-color: var(--accent-primary); outline: none; 
+.form-control-custom:focus {
+    border-color: var(--accent-primary); outline: none;
     background-color: #fff;
     box-shadow: 0 0 0 4px var(--accent-light);
 }
 
 .btn-primary-custom {
     width: 100%;
-    padding: 14px;
+    padding: 13px;
     background: linear-gradient(135deg, var(--accent-primary), var(--success));
     color: white;
     border: none;
-    border-radius: 12px;
-    font-size: 16px;
+    border-radius: 10px;
+    font-size: 15px;
     font-weight: 700;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.3s;
@@ -317,13 +497,21 @@ body {
     box-shadow: 0 4px 15px var(--accent-light);
 }
 
-.btn-primary-custom:hover { 
+.btn-primary-custom:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 168, 150, 0.3);
+    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);
 }
 
-.alert-danger { background-color: var(--danger-bg); color: var(--danger); padding: 14px; border-radius: 12px; font-size: 14px; margin-bottom: 25px; border: 1px solid rgba(230, 57, 70, 0.2); font-weight: 500; text-align: center;}
+.alert-danger { background-color: var(--danger-bg); color: var(--danger); padding: 13px 16px; border-radius: 10px; font-size: 13.5px; margin-bottom: 22px; border: 1px solid rgba(220, 38, 38, 0.2); font-weight: 500; text-align: left;}
 
-/* Utility classes for contrast on dark backgrounds */
+/* Responsive: el panel de marca se oculta y el logo de respaldo aparece */
+@media (max-width: 900px) {
+    .login-visual { display: none; }
+    .login-logo { display: block; text-align: center; }
+    .login-title, .login-subtitle { text-align: center; }
+    .login-form-panel { padding: 40px 20px; }
+}
+
+/* Utility classes for contrast */
 .text-accent { color: var(--accent-primary) !important; }
 .text-warning { color: var(--warning) !important; }

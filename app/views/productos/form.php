@@ -16,7 +16,7 @@
             <!-- Izquierda: Datos Principales -->
             <div class="col-md-8">
                 <div class="card-metric">
-                    <h5 style="color: #fff; font-size: 16px; margin-bottom: 20px;">Información Principal</h5>
+                    <h5 class="section-title">Información Principal</h5>
                     <div class="row g-3">
                         <div class="col-md-6 form-group">
                             <label class="form-label">Código de Barras</label>
@@ -93,7 +93,7 @@
 
                 <!-- Fraccionamiento Inteligente -->
                 <div class="card-metric mt-4">
-                    <h5 style="color: #fff; font-size: 16px; margin-bottom: 20px;">
+                    <h5 class="section-title">
                         <i class="bi bi-box-seam"></i> Venta Fraccionada
                     </h5>
                     <div class="form-group form-check mb-3">
@@ -101,7 +101,7 @@
                         <label class="form-check-label" style="color:var(--text-primary);" for="fraccionable">Este producto se vende por fracciones (Ej. por Blíster, por Pastilla)</label>
                     </div>
                     
-                    <div class="row g-3" id="fraccion_config" style="display: none; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; border: 1px solid var(--border-color);">
+                    <div class="row g-3" id="fraccion_config" style="display: none; background: var(--bg-dark); padding: 15px; border-radius: 10px; border: 1px solid var(--border-color);">
                         <div class="col-md-4 form-group">
                             <label class="form-label">Unidades por Caja <span class="text-danger">*</span></label>
                             <input type="number" class="form-control-custom" name="unidades_por_caja" id="uCaja" value="<?php echo ($p && isset($p['unidades_por_caja'])) ? $p['unidades_por_caja'] : '1'; ?>" min="1">
@@ -132,7 +132,7 @@
             <!-- Derecha: Finanzas e Inventario -->
             <div class="col-md-4">
                 <div class="card-metric mb-4">
-                    <h5 style="color: #fff; font-size: 16px; margin-bottom: 20px;">Precios y Márgenes</h5>
+                    <h5 class="section-title">Precios y Márgenes</h5>
                     
                     <div class="form-group">
                         <label class="form-label">Precio Compra (S/)</label>
@@ -142,7 +142,7 @@
                         <label class="form-label">Margen de Ganancia (%)</label>
                         <div class="input-group" style="border-radius:10px; overflow:hidden;">
                             <input type="number" step="0.01" class="form-control-custom calc-in" name="margen_ganancia" id="pMargen" value="<?php echo $p ? $p['margen_ganancia'] : '40.00'; ?>" required style="border-radius: 10px 0 0 10px;">
-                            <span class="input-group-text" style="background-color: var(--border-color); border:none; color:#fff;">%</span>
+                            <span class="input-group-text" style="background-color: var(--border-color); border:none; color:var(--text-primary); font-weight:600;">%</span>
                         </div>
                     </div>
                     <div class="form-group mb-0">
@@ -152,7 +152,7 @@
                 </div>
 
                 <div class="card-metric">
-                    <h5 style="color: #fff; font-size: 16px; margin-bottom: 20px;">Configuración de Stock</h5>
+                    <h5 class="section-title">Configuración de Stock</h5>
                     <div class="form-group">
                         <label class="form-label">Alerta de Stock Mínimo</label>
                         <input type="number" class="form-control-custom" name="stock_minimo" value="<?php echo $p ? $p['stock_minimo'] : '10'; ?>" required>
