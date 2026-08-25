@@ -103,28 +103,42 @@ class ConfiguracionController extends Controller {
             exit;
         }
 
-        $resetModel = $this->model('SistemaReset');
-        $exito = $resetModel->ejecutar($opcion);
+        // Paracaídas de emergencia: se genera y verifica un respaldo .sql COMPLETO
+        // antes de tocar una sola tabla. Si el backup no se pudo crear o no se pudo
+        // verificar, el reseteo se aborta de inmediato: no se ejecuta SistemaReset.
+        $backupService = $this->model('BackupService');
+        $backup = $backupService->crear();
 
-        if (!$exito) {
-            $this->flash('error', "Ocurrió un error al restablecer el sistema. La operación fue revertida por completo; no se perdió ningún dato.");
+        if (!$backup['exito']) {
+            $this->flash('error', "No se pudo generar el respaldo de seguridad previo al restablecimiento (" . $backup['error'] . "). Por tu protección, el sistema NO fue modificado y ninguna tabla fue borrada.");
             header('Location: ' . BASE_URL . 'configuracion/index');
             exit;
         }
 
-        $descripcion = $opcion === 'total'
+        $resetModel = $this->model('SistemaReset');
+        $exito = $resetModel->ejecutar($opcion);
+
+        if (!$exito) {
+            $this->flash('error', "Ocurrió un error al restablecer el sistema. La operación fue revertida por completo; no se perdió ningún dato. El respaldo generado antes del intento sigue disponible en: " . $backup['ruta_relativa']);
+            header('Location: ' . BASE_URL . 'configuracion/index');
+            exit;
+        }
+
+        $descripcion = ($opcion === 'total'
             ? "Restablecimiento TOTAL del sistema a estado de fábrica (catálogos y transacciones eliminados)."
-            : "Limpieza de transacciones del sistema (catálogos preservados).";
+            : "Limpieza de transacciones del sistema (catálogos preservados).")
+            . " Respaldo previo generado en " . $backup['ruta_relativa'] . " (método: " . $backup['metodo'] . ").";
         $this->logAccion('Configuracion', 'RESET_SISTEMA', $descripcion);
 
         // Cerramos la sesión actual de forma segura y abrimos una nueva, vacía, solo
-        // para poder entregar el mensaje de éxito vía el sistema global de flash() en
+        // para poder entregar los mensajes de éxito vía el sistema global de flash() en
         // la pantalla de login (auth/login.php no usa el layout principal, así que
         // incluye su propio partials/flash.php).
         $_SESSION = [];
         session_destroy();
         session_start();
         $this->flash('success', "El sistema fue restablecido correctamente. Por favor, inicia sesión nuevamente.");
+        $this->flash('info', "Respaldo de seguridad guardado automáticamente en: " . $backup['ruta_relativa'] . " — consérvalo en un lugar seguro fuera del servidor.");
 
         header('Location: ' . BASE_URL . 'auth/login');
         exit;

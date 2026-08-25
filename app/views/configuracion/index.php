@@ -185,6 +185,12 @@ $logo_url = !empty($c['logo']['valor']) ? $c['logo']['valor'] : BASE_URL . 'img/
             Al finalizar se cerrará tu sesión automáticamente y deberás iniciar sesión de nuevo.
         </p>
 
+        <div style="background: var(--success-bg); border: 1px solid var(--accent-primary); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; font-size: 13px; color: var(--text-primary);">
+            <i class="bi bi-shield-check" style="color: var(--accent-primary);"></i>
+            <strong>Tranquilo, tienes un paracaídas:</strong> justo antes de borrar cualquier dato, el sistema crea automáticamente una copia de seguridad completa (<code>.sql</code>) en la carpeta <code>app/backups/</code>. Si por algún motivo esa copia no se puede crear, el reseteo se cancela solo y no se toca nada. La ruta exacta del backup se te mostrará al terminar.
+            Guía completa para cualquier persona (sin conocimientos técnicos): archivo <strong>MANUAL_RESPALDO_Y_RESETEO.md</strong> en la carpeta principal del sistema.
+        </div>
+
         <form action="<?php echo BASE_URL; ?>configuracion/reset" method="POST" id="formReset"
               onsubmit="return confirm('Esta acción eliminará datos de forma PERMANENTE y no se puede deshacer.\n\n¿Estás completamente seguro de continuar?');">
             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">

@@ -1,0 +1,10 @@
+# Defensa en profundidad: app/ ya está fuera de public/ (la única raíz servida
+# por Apache), pero por si la configuración del servidor cambiara, se deniega
+# también explícitamente el acceso directo a los backups generados antes de
+# cada Restablecer a Estado de Fábrica.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Deny from all
+</IfModule>

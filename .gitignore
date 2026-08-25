@@ -3,6 +3,18 @@
 *backup*.sql
 bk_*.sql
 
+# Respaldos automáticos que BackupService genera antes de cada Restablecer a
+# Estado de Fábrica (ver app/models/BackupService.php). Contienen datos reales
+# de la botica y no deben subirse al repositorio.
+app/backups/*.sql
+app/backups/*.sql.err
+!app/backups/.gitkeep
+!app/backups/.htaccess
+
+# Ruta local de mysqldump.exe detectada por setup/configurar_entorno.bat: es
+# específica de cada máquina, no debe versionarse.
+app/config/mysqldump_path.txt
+
 # Archivos temporales del módulo de Importación Masiva (CSV subidos en proceso de
 # validación; se borran solos al confirmar o cancelar, no deben versionarse)
 storage/imports/*

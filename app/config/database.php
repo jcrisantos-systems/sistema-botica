@@ -17,5 +17,12 @@ class Database {
         }
         return $this->conn;
     }
+
+    // Getters de solo lectura para las credenciales, usados por BackupService para
+    // poder invocar mysqldump con exactamente los mismos datos de conexión que PDO.
+    public function getHost() { return $this->host; }
+    public function getDbName() { return $this->db_name; }
+    public function getUsername() { return $this->username; }
+    public function getPassword() { return $this->password; }
 }
 ?>
