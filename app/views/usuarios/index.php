@@ -1,16 +1,18 @@
-<div class="container-fluid px-4 pt-4">
+<div class="page-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="h3 text-gray-800 mb-0">Gestión de Personal</h2>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userModal" onclick="resetForm()">
+        <div>
+            <h1 class="page-title">Gestión de Personal</h1>
+            <div class="page-subtitle">Administra los usuarios del sistema y sus roles de acceso.</div>
+        </div>
+        <button class="btn-primary-custom" style="width: auto; padding: 10px 20px;" data-bs-toggle="modal" data-bs-target="#userModal" onclick="resetForm()">
             <i class="bi bi-person-plus"></i> Nuevo Usuario
         </button>
     </div>
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
+    <div class="card-metric">
             <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
+                <table class="table table-hover align-middle" style="width: 100%; font-size: 14px;">
+                    <thead>
                         <tr>
                             <th>ID</th>
                             <th>Nombres y Apellidos</th>
@@ -65,7 +67,6 @@
                     </tbody>
                 </table>
             </div>
-        </div>
     </div>
 </div>
 
@@ -75,7 +76,7 @@
         <form action="<?php echo BASE_URL; ?>usuario/save" method="POST" class="modal-content">
             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Nuevo Usuario</h5>
+                <h5 class="modal-title" id="modalTitle" style="color: var(--text-primary); font-size: 16px; font-weight:700;">Nuevo Usuario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -84,27 +85,27 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label">Nombres <span class="text-danger">*</span></label>
-                        <input type="text" name="nombres" id="nombres" class="form-control" required>
+                        <input type="text" name="nombres" id="nombres" class="form-control-custom" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Apellidos <span class="text-danger">*</span></label>
-                        <input type="text" name="apellidos" id="apellidos" class="form-control" required>
+                        <input type="text" name="apellidos" id="apellidos" class="form-control-custom" required>
                     </div>
                 </div>
                 
                 <div class="mb-3">
                     <label class="form-label">Correo Electrónico</label>
-                    <input type="email" name="email" id="email" class="form-control">
+                    <input type="email" name="email" id="email" class="form-control-custom">
                 </div>
                 
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label">Nombre de Usuario <span class="text-danger">*</span></label>
-                        <input type="text" name="usuario" id="usuario" class="form-control" required>
+                        <input type="text" name="usuario" id="usuario" class="form-control-custom" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Rol <span class="text-danger">*</span></label>
-                        <select name="rol_id" id="rol_id" class="form-select" required>
+                        <select name="rol_id" id="rol_id" class="form-control-custom" required>
                             <option value="">Seleccione...</option>
                             <?php foreach ($data['roles'] as $r): ?>
                                 <option value="<?php echo $r['id']; ?>"><?php echo htmlspecialchars($r['nombre']); ?></option>
@@ -115,14 +116,14 @@
                 
                 <div class="mb-3">
                     <label class="form-label">Contraseña <span id="passReq" class="text-danger">*</span></label>
-                    <input type="password" name="password" id="password" class="form-control">
+                    <input type="password" name="password" id="password" class="form-control-custom">
                     <small class="text-muted" id="passHelp" style="display:none;">Deje en blanco para no cambiarla.</small>
                 </div>
                 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Guardar</button>
+                <button type="button" class="btn btn-secondary" style="border-radius:10px;" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn-primary-custom" style="width: auto; padding: 8px 20px;">Guardar</button>
             </div>
         </form>
     </div>

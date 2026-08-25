@@ -62,7 +62,7 @@
                         <td class="text-end">
                             <?php if(isset($prod['estado']) && $prod['estado'] == 0): ?>
                                 <span class="badge bg-secondary me-1" style="font-size: 10px;">Inactivo</span>
-                                <a href="<?php echo BASE_URL; ?>producto/edit/<?php echo $prod['id']; ?>" class="btn btn-sm" style="color: #00CFE8;" title="Editar">
+                                <a href="<?php echo BASE_URL; ?>producto/edit/<?php echo $prod['id']; ?>" class="btn btn-sm" style="color: var(--accent-primary);" title="Editar">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
                                 <form action="<?php echo BASE_URL; ?>producto/toggle/<?php echo $prod['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas activar este producto para su venta?');">
@@ -73,7 +73,7 @@
                                 </form>
                             <?php else: ?>
                                 <span class="badge bg-success me-1" style="font-size: 10px;">Activo</span>
-                                <a href="<?php echo BASE_URL; ?>producto/edit/<?php echo $prod['id']; ?>" class="btn btn-sm" style="color: #00CFE8;" title="Editar">
+                                <a href="<?php echo BASE_URL; ?>producto/edit/<?php echo $prod['id']; ?>" class="btn btn-sm" style="color: var(--accent-primary);" title="Editar">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
                                 <form action="<?php echo BASE_URL; ?>producto/toggle/<?php echo $prod['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas desactivar este producto? Ya no aparecerá en el POS.');">

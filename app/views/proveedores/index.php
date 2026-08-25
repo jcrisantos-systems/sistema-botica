@@ -34,7 +34,7 @@
                         <td><?php echo htmlspecialchars($prov['telefono'] ?? ''); ?></td>
                         <td><?php echo htmlspecialchars($prov['direccion'] ?? ''); ?></td>
                         <td class="text-end">
-                            <button class="btn btn-sm" style="color: #00CFE8;" onclick="editarRegistro(<?php echo htmlspecialchars(json_encode($prov)); ?>)">
+                            <button class="btn btn-sm" style="color: var(--accent-primary);" onclick="editarRegistro(<?php echo htmlspecialchars(json_encode($prov)); ?>)">
                                 <i class="bi bi-pencil-square"></i>
                             </button>
                             <form action="<?php echo BASE_URL; ?>proveedor/delete/<?php echo $prov['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar este proveedor?');">

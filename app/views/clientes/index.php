@@ -38,7 +38,7 @@
                             <?php if($cli['id'] == 1): ?>
                             <span class="badge bg-secondary">Genérico</span>
                             <?php else: ?>
-                            <button class="btn btn-sm" style="color: #00CFE8;" onclick="editarRegistro(<?php echo htmlspecialchars(json_encode($cli)); ?>)">
+                            <button class="btn btn-sm" style="color: var(--accent-primary);" onclick="editarRegistro(<?php echo htmlspecialchars(json_encode($cli)); ?>)">
                                 <i class="bi bi-pencil-square"></i>
                             </button>
                             <form action="<?php echo BASE_URL; ?>cliente/delete/<?php echo $cli['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar el registro?');">

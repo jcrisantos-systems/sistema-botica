@@ -30,7 +30,7 @@
             <!-- Izquierda: Resumen de cuenta -->
             <div class="col-md-4">
                 <div class="perfil-card text-center">
-                    <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($u['nombres'] . ' ' . $u['apellidos']); ?>&background=00A896&color=fff&bold=true&size=110"
+                    <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($u['nombres'] . ' ' . $u['apellidos']); ?>&background=059669&color=fff&bold=true&size=110"
                          alt="Avatar" style="width:110px; height:110px; border-radius:50%; box-shadow:0 2px 8px rgba(0,0,0,0.15); margin-bottom:18px;">
                     <h5 style="color: var(--text-primary); font-weight:700;"><?php echo htmlspecialchars($u['nombres'] . ' ' . $u['apellidos'], ENT_QUOTES, 'UTF-8'); ?></h5>
                     <span class="badge bg-secondary mb-2">@<?php echo htmlspecialchars($u['usuario'], ENT_QUOTES, 'UTF-8'); ?></span>
@@ -80,7 +80,7 @@
         </div>
 
         <div class="text-end mt-4">
-            <button type="submit" class="btn btn-primary" style="padding: 10px 28px;">
+            <button type="submit" class="btn-primary-custom" style="width: auto; padding: 10px 28px;">
                 <i class="bi bi-save2-fill"></i> Guardar Cambios
             </button>
         </div>

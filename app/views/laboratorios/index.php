@@ -30,7 +30,7 @@
                         <td style="font-weight:700; color:var(--text-primary);"><?php echo htmlspecialchars($lab['nombre']); ?></td>
                         <td style="color:var(--text-secondary);"><?php echo htmlspecialchars($lab['descripcion'] ?? ''); ?></td>
                         <td class="text-end">
-                            <button class="btn btn-sm" style="color: #00CFE8;" onclick="editarRegistro(<?php echo htmlspecialchars(json_encode($lab)); ?>)">
+                            <button class="btn btn-sm" style="color: var(--accent-primary);" onclick="editarRegistro(<?php echo htmlspecialchars(json_encode($lab)); ?>)">
                                 <i class="bi bi-pencil-square"></i>
                             </button>
                             <form action="<?php echo BASE_URL; ?>laboratorio/delete/<?php echo $lab['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar este laboratorio?');">

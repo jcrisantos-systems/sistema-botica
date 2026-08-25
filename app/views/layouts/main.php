@@ -193,7 +193,7 @@
                 </a>
                 <div class="dropdown">
                     <a href="#" class="user-profile" id="userMenuToggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration:none;">
-                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nombre'] ?? 'U'); ?>&background=00A896&color=fff&bold=true" alt="User Avatar">
+                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nombre'] ?? 'U'); ?>&background=059669&color=fff&bold=true" alt="User Avatar">
                         <div class="user-info">
                             <span class="user-name"><?php echo htmlspecialchars($_SESSION['nombre'] ?? 'Administrador', ENT_QUOTES, 'UTF-8'); ?></span>
                             <span class="user-role">
