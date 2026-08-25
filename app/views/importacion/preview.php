@@ -12,7 +12,7 @@
     <?php if ($data['totalValidas'] === 0): ?>
         <div class="alert alert-danger"><i class="bi bi-exclamation-octagon-fill"></i> Ninguna fila pasó la validación. Corrige el archivo y vuelve a subirlo.</div>
     <?php else: ?>
-        <div class="alert" style="background: rgba(255,193,7,0.12); border:1px solid #ffc107; color:#856404;">
+        <div class="alert" style="background: var(--warning-bg); border:1px solid var(--warning); color: var(--warning);">
             <i class="bi bi-info-circle-fill"></i> Al confirmar, solo se procesarán las <strong><?php echo $data['totalValidas']; ?> filas válidas</strong> (en verde). Las filas en rojo se omitirán; corrígelas en el archivo original y súbelo de nuevo si quieres incluirlas.
         </div>
     <?php endif; ?>
@@ -31,7 +31,7 @@
                 </thead>
                 <tbody>
                     <?php foreach($data['filas'] as $f): ?>
-                    <tr style="<?php echo $f['valida'] ? 'background: rgba(2,195,154,0.08);' : 'background: rgba(230,57,70,0.10);'; ?>">
+                    <tr style="<?php echo $f['valida'] ? 'background: rgba(16,185,129,0.08);' : 'background: rgba(220,38,38,0.10);'; ?>">
                         <td><?php echo (int)$f['fila']; ?></td>
                         <td>
                             <?php if ($f['valida']): ?>
@@ -45,7 +45,7 @@
                         <?php endforeach; ?>
                     </tr>
                     <?php if (!$f['valida']): ?>
-                    <tr style="background: rgba(230,57,70,0.04);">
+                    <tr style="background: rgba(220,38,38,0.04);">
                         <td></td>
                         <td colspan="<?php echo count($data['columnas']) + 1; ?>" style="color: var(--danger); font-size:11px;">
                             <i class="bi bi-exclamation-triangle"></i> <?php echo htmlspecialchars(implode(' · ', $f['errores']), ENT_QUOTES, 'UTF-8'); ?>

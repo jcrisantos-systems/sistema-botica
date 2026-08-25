@@ -28,7 +28,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">¿Qué vas a importar?</label>
-                        <select name="entidad" class="form-select" required>
+                        <select name="entidad" class="form-control-custom" required>
                             <option value="">Selecciona...</option>
                             <?php foreach($data['entidades'] as $key => $ent): ?>
                             <option value="<?php echo htmlspecialchars($key, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($ent['label'], ENT_QUOTES, 'UTF-8'); ?></option>
@@ -38,7 +38,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Archivo CSV completado</label>
-                        <input type="file" name="archivo" class="form-control" accept=".csv" required>
+                        <input type="file" name="archivo" class="form-control-custom" accept=".csv" required>
                         <small class="text-muted">Solo .csv (UTF-8). Si lo editaste en Excel: <em>Archivo &gt; Guardar como &gt; CSV UTF-8 (delimitado por comas)</em>.</small>
                     </div>
 
