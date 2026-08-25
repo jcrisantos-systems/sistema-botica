@@ -116,7 +116,7 @@
                     <?php foreach($data['pagos'] as $i => $p): ?>
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="text-secondary font-weight-500" style="font-size: 13px;">
-                                <i class="bi bi-circle-fill me-1" style="font-size: 8px; color: <?php echo ['#00A896', '#02C39A', '#3498DB', '#F4A261'][$i % 4]; ?>"></i>
+                                <i class="bi bi-circle-fill me-1" style="font-size: 8px; color: <?php echo ['#059669', '#10B981', '#3498DB', '#F4A261'][$i % 4]; ?>"></i>
                                 <?php echo htmlspecialchars($p['label']); ?>
                             </span>
                             <span class="font-weight-600" style="font-size: 13px;">S/ <?php echo number_format($p['value'], 2); ?></span>
@@ -147,7 +147,7 @@
     const pieData = <?php echo json_encode($pagosData); ?>;
 
     // Config Inicial UI ChartJS (Claro/Médico)
-    Chart.defaults.color = '#7F8C8D';
+    Chart.defaults.color = '#64748B';
     Chart.defaults.font.family = "'Inter', sans-serif";
     Chart.defaults.font.size = 12;
 
@@ -156,8 +156,8 @@
     
     // Crear Gradiente para las barras
     let gradientBar = ctxBar.createLinearGradient(0, 0, 0, 400);
-    gradientBar.addColorStop(0, '#00A896');
-    gradientBar.addColorStop(1, '#02C39A');
+    gradientBar.addColorStop(0, '#059669');
+    gradientBar.addColorStop(1, '#10B981');
 
     new Chart(ctxBar, {
         type: 'bar',
@@ -178,7 +178,7 @@
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: '#2C3E50',
+                    backgroundColor: '#1E293B',
                     padding: 12,
                     titleFont: { size: 14, family: 'Inter' },
                     bodyFont: { size: 14, weight: 'bold' },
@@ -224,7 +224,7 @@
             labels: realLabels,
             datasets: [{
                 data: realData,
-                backgroundColor: ['#00A896', '#02C39A', '#3498DB', '#F4A261', '#E63946'],
+                backgroundColor: ['#059669', '#10B981', '#3498DB', '#F4A261', '#DC2626'],
                 borderWidth: 2,
                 borderColor: '#ffffff',
                 hoverOffset: 6
@@ -239,7 +239,7 @@
                     display: false // Oculto el legend automático para usar el HTML de abajo
                 },
                 tooltip: {
-                    backgroundColor: '#2C3E50',
+                    backgroundColor: '#1E293B',
                     padding: 12,
                     callbacks: {
                         label: function(context) {
