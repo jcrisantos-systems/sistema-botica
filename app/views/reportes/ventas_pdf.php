@@ -8,7 +8,7 @@
         .cabecera { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
         .logo { max-height: 60px; max-width: 150px; object-fit: contain; }
         .info-empresa { text-align: right; }
-        .info-empresa h2 { margin: 0 0 5px 0; font-size: 18px; color: #1FA95B; }
+        .info-empresa h2 { margin: 0 0 5px 0; font-size: 18px; color: #059669; }
         .info-empresa p { margin: 0; font-size: 11px; color: #666; }
         h1.titulo-reporte { text-align: center; font-size: 16px; margin: 20px 0; padding: 5px; background: #f4f4f4; border: 1px solid #ddd; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
@@ -19,9 +19,9 @@
         .totales-box { width: 300px; float: right; border: 1px solid #000; padding: 10px; background: #fff; }
         .totales-box p { margin: 5px 0; display: flex; justify-content: space-between; }
         .totales-box .gran-total { font-size: 14px; font-weight: bold; border-top: 1px solid #ccc; padding-top: 5px; margin-top: 5px; }
-        
+
         .no-print { text-align: center; margin-bottom: 20px; }
-        .btn-print { background: #000; color: #fff; padding: 10px 20px; font-weight: bold; border: none; cursor: pointer; border-radius: 5px; }
+        .btn-print { background: #059669; color: #fff; padding: 10px 20px; font-weight: bold; border: none; cursor: pointer; border-radius: 8px; }
         
         @media print {
             .no-print { display: none !important; }

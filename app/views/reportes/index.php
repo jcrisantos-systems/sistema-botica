@@ -1,7 +1,7 @@
 <div class="page-content">
     <div class="row align-items-center mb-4">
         <div class="col">
-            <h2 class="page-title"><i class="bi bi-bar-chart-line-fill text-primary"></i> Reportes Gerenciales</h2>
+            <h2 class="page-title"><i class="bi bi-bar-chart-line-fill" style="color: var(--accent-primary);"></i> Reportes Gerenciales</h2>
             <p class="page-subtitle mt-2">Centro de descargas y auditoría para fines contables y de supervisión.</p>
         </div>
     </div>
@@ -11,7 +11,7 @@
         <div class="col-md-6">
             <div class="card card-metric h-100">
                 <div class="card-body d-flex flex-column" style="padding: 5px;">
-                    <h5 class="text-primary font-weight-bold mb-3"><i class="bi bi-file-earmark-excel-fill text-success"></i> Extracto de Ventas</h5>
+                    <h5 class="section-title"><i class="bi bi-file-earmark-excel-fill text-success"></i> Extracto de Ventas</h5>
                     <p class="text-muted" style="font-size: 14px;">Genera un archivo Excel (.csv compatibilidad universal) con el desglose de ventas, impuestos asimilados y métodos de pago.</p>
                     
                     <form action="<?php echo BASE_URL; ?>reporte/exportar_ventas" method="GET" class="mt-auto">
@@ -46,7 +46,7 @@
         <div class="col-md-6">
             <div class="card card-metric h-100">
                 <div class="card-body d-flex flex-column" style="padding: 5px;">
-                    <h5 class="text-primary font-weight-bold mb-3"><i class="bi bi-box-seam-fill text-warning"></i> Medicamentos por Vencer</h5>
+                    <h5 class="section-title"><i class="bi bi-box-seam-fill text-warning"></i> Medicamentos por Vencer</h5>
                     <p class="text-muted" style="font-size: 14px;">Descarga la relación de lotes farmacológicos cuyo vencimiento esté marcado dentro de los próximos 90 días o ya estén mermados.</p>
                     
                     <div class="row g-2 mt-auto">

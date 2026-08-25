@@ -28,8 +28,8 @@
 <body>
     <div class="ticket">
         <div class="no-print center" style="margin-bottom: 15px;">
-            <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer; background: #000; color:#fff; border:none; font-weight:bold;">IMPRIMIR TICKET</button>
-            <button onclick="window.close()" style="padding: 10px; cursor: pointer; background: #ccc; border:none;">X Cerrar</button>
+            <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer; background: #059669; color:#fff; border:none; font-weight:bold; border-radius: 8px;">IMPRIMIR TICKET</button>
+            <button onclick="window.close()" style="padding: 10px; cursor: pointer; background: #e5e7eb; color:#333; border:none; border-radius: 8px;">X Cerrar</button>
         </div>
 
         <div class="center">

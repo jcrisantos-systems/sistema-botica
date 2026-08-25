@@ -8,7 +8,7 @@
         .cabecera { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
         .logo { max-height: 60px; max-width: 150px; object-fit: contain; }
         .info-empresa { text-align: right; }
-        .info-empresa h2 { margin: 0 0 5px 0; font-size: 18px; color: #1FA95B; }
+        .info-empresa h2 { margin: 0 0 5px 0; font-size: 18px; color: #059669; }
         .info-empresa p { margin: 0; font-size: 11px; color: #666; }
         h1.titulo-reporte { text-align: center; font-size: 16px; margin: 20px 0; padding: 5px; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
@@ -20,7 +20,7 @@
         .badge-naranja { background: #ffc107; color:#000; padding:3px 8px; border-radius:3px; font-weight:bold; }
         
         .no-print { text-align: center; margin-bottom: 20px; }
-        .btn-print { background: #000; color: #fff; padding: 10px 20px; font-weight: bold; border: none; cursor: pointer; border-radius: 5px; }
+        .btn-print { background: #059669; color: #fff; padding: 10px 20px; font-weight: bold; border: none; cursor: pointer; border-radius: 8px; }
         
         @media print {
             .no-print { display: none !important; }
