@@ -56,7 +56,7 @@ body { overflow-x: hidden; }
 
             <!-- Area de lista de productos (Carrito) -->
             <div class="pos-cart" id="cartContainer">
-                <table style="width: 100%; color: #222;">
+                <table style="width: 100%; color: var(--text-primary);">
                     <thead>
                         <tr style="border-bottom: 2px solid var(--border-color); color:var(--text-secondary); font-size:12px; text-transform:uppercase;">
                             <th class="pb-2">Producto</th>
@@ -143,7 +143,7 @@ body { overflow-x: hidden; }
                                 <input type="hidden" id="fiIgv" name="igv_venta" value="0">
                             </div>
                             <div class="d-flex justify-content-between">
-                                <span style="font-size: 20px; font-weight:700; color:#333;">Total:</span>
+                                <span style="font-size: 20px; font-weight:700; color:var(--text-primary);">Total:</span>
                                 <span style="font-size: 28px; font-weight:800; color:var(--accent-primary);" id="txtTot">S/ 0.00</span>
                                 <input type="hidden" id="fiTot" name="total_venta" value="0">
                             </div>
@@ -186,7 +186,7 @@ body { overflow-x: hidden; }
             ?>
             <div class="item-card <?php echo $disabledClass; ?>" data-id="<?php echo $prod['id']; ?>" data-busqueda="<?php echo strtolower($prod['codigo_barras'] . ' ' . $prod['nombre_comercial'] . ' ' . $prod['nombre_generico']); ?>" onclick='agregarAlCarrito(<?php echo htmlspecialchars($jsonP, ENT_QUOTES); ?>)'>
                 <div style="flex-grow:1;">
-                    <strong style="color:#222; display:block; font-size: 14px;"><?php echo htmlspecialchars($prod['nombre_comercial']); ?></strong>
+                    <strong style="color:var(--text-primary); display:block; font-size: 14px;"><?php echo htmlspecialchars($prod['nombre_comercial']); ?></strong>
                     <span style="font-size: 11px; color:var(--text-secondary);"><?php echo htmlspecialchars($prod['unidad_medida'] . ' ' . $prod['concentracion']); ?> | <span data-stock-label><?php echo $stock > 0 ? "Stock U.Mín: $stock" : "<span class='text-danger'>Agotado</span>"; ?></span></span>
                 </div>
                 <div style="font-weight: 700; color: var(--accent-primary); font-size: 16px;">
@@ -421,7 +421,7 @@ function renderCarrito() {
             tbody.innerHTML += `
             <tr class="tr-cart">
                 <td>
-                    <strong style="color:#222;font-size:14px;display:block;">${item.nombre}</strong>
+                    <strong style="color:var(--text-primary);font-size:14px;display:block;">${item.nombre}</strong>
                     ${comboUnidad}
                 </td>
                 <td class="text-center" style="vertical-align:top; pt-2;">
