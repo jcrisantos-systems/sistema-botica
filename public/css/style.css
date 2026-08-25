@@ -512,7 +512,8 @@ body {
     .login-form-panel { padding: 40px 20px; }
 }
 
-/* Badge de estado (usado en Fechas de Vencimiento junto a bg-danger/bg-warning/bg-success) */
+/* Badge de estado (usado en Fechas de Vencimiento junto a bg-danger/bg-warning/bg-success,
+   y en Productos junto a status-pending/status-delivered) */
 .badge-status {
     display: inline-block;
     padding: 4px 10px;
@@ -520,6 +521,8 @@ body {
     font-size: 11px;
     font-weight: 700;
 }
+.status-pending { background-color: var(--danger); color: #fff; }
+.status-delivered { background-color: var(--success); color: #fff; }
 
 /* Utility classes for contrast */
 .text-accent { color: var(--accent-primary) !important; }

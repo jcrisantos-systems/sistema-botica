@@ -50,15 +50,15 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Nombres</label>
-                            <input type="text" name="nombres" class="form-control" value="<?php echo htmlspecialchars($u['nombres'], ENT_QUOTES, 'UTF-8'); ?>" required>
+                            <input type="text" name="nombres" class="form-control-custom" value="<?php echo htmlspecialchars($u['nombres'], ENT_QUOTES, 'UTF-8'); ?>" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Apellidos</label>
-                            <input type="text" name="apellidos" class="form-control" value="<?php echo htmlspecialchars($u['apellidos'], ENT_QUOTES, 'UTF-8'); ?>" required>
+                            <input type="text" name="apellidos" class="form-control-custom" value="<?php echo htmlspecialchars($u['apellidos'], ENT_QUOTES, 'UTF-8'); ?>" required>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label">Correo Electrónico</label>
-                            <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($u['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                            <input type="email" name="email" class="form-control-custom" value="<?php echo htmlspecialchars($u['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
                     </div>
 
@@ -67,11 +67,11 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Contraseña Actual</label>
-                            <input type="password" name="password_actual" class="form-control" autocomplete="current-password">
+                            <input type="password" name="password_actual" class="form-control-custom" autocomplete="current-password">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Contraseña Nueva</label>
-                            <input type="password" name="password_nueva" class="form-control" minlength="8" autocomplete="new-password">
+                            <input type="password" name="password_nueva" class="form-control-custom" minlength="8" autocomplete="new-password">
                             <small class="text-muted">Mínimo 8 caracteres.</small>
                         </div>
                     </div>

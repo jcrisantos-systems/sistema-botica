@@ -42,7 +42,7 @@
                     <?php else: ?>
                     <?php foreach($data['productos'] as $prod): ?>
                     <tr>
-                        <td style="color:#A0A0A0; font-family:monospace;"><?php echo htmlspecialchars($prod['codigo_barras']); ?></td>
+                        <td style="color:var(--text-secondary); font-family:monospace;"><?php echo htmlspecialchars($prod['codigo_barras']); ?></td>
                         <td>
                             <div style="font-weight:700; color:var(--text-primary);"><?php echo htmlspecialchars($prod['nombre_comercial']); ?></div>
                             <div style="font-size:12px; color:var(--text-secondary);">

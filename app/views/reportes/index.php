@@ -18,11 +18,11 @@
                         <div class="row g-2 mb-3">
                             <div class="col-6">
                                 <label class="form-label" style="font-size: 12px; font-weight:600;">Fecha Desde</label>
-                                <input type="date" name="fecha_inicio" class="form-control" value="<?php echo date('Y-m-d', strtotime('-7 days')); ?>" max="<?php echo date('Y-m-d'); ?>" required>
+                                <input type="date" name="fecha_inicio" class="form-control-custom" value="<?php echo date('Y-m-d', strtotime('-7 days')); ?>" max="<?php echo date('Y-m-d'); ?>" required>
                             </div>
                             <div class="col-6">
                                 <label class="form-label" style="font-size: 12px; font-weight:600;">Fecha Hasta</label>
-                                <input type="date" name="fecha_fin" class="form-control" value="<?php echo date('Y-m-d'); ?>" max="<?php echo date('Y-m-d'); ?>" required>
+                                <input type="date" name="fecha_fin" class="form-control-custom" value="<?php echo date('Y-m-d'); ?>" max="<?php echo date('Y-m-d'); ?>" required>
                             </div>
                         </div>
                         <div class="row g-2">

@@ -1,47 +1,45 @@
-<div class="container-fluid px-4 pt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="h3 text-gray-800 mb-0">Historial de Cajas (Arqueos)</h2>
+<div class="page-content">
+    <div class="mb-4">
+        <h1 class="page-title">Historial de Cajas (Arqueos)</h1>
+        <div class="page-subtitle">Consulta los turnos de caja abiertos y cerrados por fecha.</div>
     </div>
 
     <!-- Filtros -->
-    <div class="card shadow-sm border-0 mb-4 bg-white">
-        <div class="card-body">
-            <form method="GET" action="<?php echo BASE_URL; ?>caja/index" class="row align-items-end g-3">
-                <div class="col-md-3">
-                    <label class="form-label mb-0 text-muted" style="font-size:12px; font-weight:600">Fecha Inicio</label>
-                    <input type="date" name="fecha_inicio" class="form-control" value="<?php echo $data['fecha_inicio']; ?>">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label mb-0 text-muted" style="font-size:12px; font-weight:600">Fecha Fin</label>
-                    <input type="date" name="fecha_fin" class="form-control" value="<?php echo $data['fecha_fin']; ?>">
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-search"></i> Buscar
-                    </button>
-                </div>
-            </form>
-        </div>
+    <div class="card-metric mb-4 p-3">
+        <form method="GET" action="<?php echo BASE_URL; ?>caja/index" class="row align-items-end g-3">
+            <div class="col-md-3">
+                <label class="form-label" style="font-size:12px;">Fecha Inicio</label>
+                <input type="date" name="fecha_inicio" class="form-control-custom" value="<?php echo $data['fecha_inicio']; ?>">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" style="font-size:12px;">Fecha Fin</label>
+                <input type="date" name="fecha_fin" class="form-control-custom" value="<?php echo $data['fecha_fin']; ?>">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn-primary-custom" style="width:100%;">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+            </div>
+        </form>
     </div>
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Nº Arqueo</th>
-                            <th>Cajero / Usuario</th>
-                            <th>Apertura</th>
-                            <th>Cierre</th>
-                            <th>Inicial (S/)</th>
-                            <th>Ingresos Efectivo</th>
-                            <th>Tran/Tarj</th>
-                            <th>Dif.</td>
-                            <th>Estado</th>
-                            <th>Opciones</th>
-                        </tr>
-                    </thead>
+    <div class="card-metric">
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Nº Arqueo</th>
+                        <th>Cajero / Usuario</th>
+                        <th>Apertura</th>
+                        <th>Cierre</th>
+                        <th>Inicial (S/)</th>
+                        <th>Ingresos Efectivo</th>
+                        <th>Tran/Tarj</th>
+                        <th>Dif.</th>
+                        <th>Estado</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
                     <tbody>
                         <?php foreach ($data['historial'] as $c): ?>
                         <tr>
@@ -49,7 +47,7 @@
                             <td><?php echo htmlspecialchars($c['nombres'] . ' ' . $c['apellidos']); ?></td>
                             <td><?php echo date('d/m H:i', strtotime($c['fecha_apertura'])); ?></td>
                             <td><?php echo $c['fecha_cierre'] ? date('d/m H:i', strtotime($c['fecha_cierre'])) : '-'; ?></td>
-                            <td class="text-primary font-weight-bold"><?php echo $c['monto_inicial']; ?></td>
+                            <td style="color:var(--accent-primary); font-weight:700;"><?php echo $c['monto_inicial']; ?></td>
                             <td><?php echo $c['ingresos_efectivo']; ?></td>
                             <td><?php echo $c['ingresos_transferencia']; ?></td>
                             <td>
@@ -90,6 +88,5 @@
                     </tbody>
                 </table>
             </div>
-        </div>
     </div>
 </div>
