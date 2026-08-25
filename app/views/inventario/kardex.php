@@ -110,7 +110,7 @@
                 <div class="modal-body bg-light">
                     <div class="mb-3">
                         <label class="form-label fw-bold text-secondary" style="font-size:13px;">Producto a afectar</label>
-                        <select class="form-select form-control-custom" name="id_producto" required>
+                        <select class="form-control-custom" name="id_producto" required>
                             <option value="">Seleccione el producto...</option>
                             <?php foreach($data['productos'] as $pd): ?>
                             <option value="<?php echo $pd['id']; ?>"><?php echo htmlspecialchars($pd['nombre_comercial'] . ' (U.M: ' . $pd['unidad_medida'] . ')'); ?></option>
@@ -120,22 +120,22 @@
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold text-secondary" style="font-size:13px;">Cant. (Unds Mínimas)</label>
-                            <input type="number" class="form-control" name="cantidad" min="1" required placeholder="Ej. 100">
+                            <input type="number" class="form-control-custom" name="cantidad" min="1" required placeholder="Ej. 100">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold text-secondary" style="font-size:13px;">Código Lote Físico</label>
-                            <input type="text" class="form-control" name="lote" placeholder="Dejar en blanco si no aplica">
+                            <input type="text" class="form-control-custom" name="lote" placeholder="Dejar en blanco si no aplica">
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold text-secondary" style="font-size:13px;">Fecha Vencimiento (Lote)</label>
-                            <input type="date" class="form-control" name="fecha_vencimiento">
+                            <input type="date" class="form-control-custom" name="fecha_vencimiento">
                             <small class="text-muted" style="font-size:11px;">Opcional, requiere lote.</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold text-secondary" style="font-size:13px;">Motivo Operación</label>
-                            <input type="text" class="form-control" name="motivo" required placeholder="Inventario Inicial, Sobrante...">
+                            <input type="text" class="form-control-custom" name="motivo" required placeholder="Inventario Inicial, Sobrante...">
                         </div>
                     </div>
                 </div>

@@ -46,7 +46,7 @@
                             $dias = $diferencia->days;
                             $invertido = $diferencia->invert; // 1 si ya pasó la fecha
                             
-                            $estadoCss = 'status-delivered';
+                            $estadoCss = 'bg-success text-white border-0';
                             $estadoText = 'Sano';
                             $estadoFiltro = 'Verde';
                             $colorFila = '';

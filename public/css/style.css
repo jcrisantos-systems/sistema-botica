@@ -512,6 +512,15 @@ body {
     .login-form-panel { padding: 40px 20px; }
 }
 
+/* Badge de estado (usado en Fechas de Vencimiento junto a bg-danger/bg-warning/bg-success) */
+.badge-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
 /* Utility classes for contrast */
 .text-accent { color: var(--accent-primary) !important; }
 .text-warning { color: var(--warning) !important; }
