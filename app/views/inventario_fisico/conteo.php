@@ -81,7 +81,7 @@ function calcularDiferencia(input) {
     } else if(dif < 0) {
         celda.style.color = '#e74c3c'; // Faltante
     } else {
-        celda.style.color = '#fff';
+        celda.style.color = 'var(--text-primary)';
     }
 }
 
