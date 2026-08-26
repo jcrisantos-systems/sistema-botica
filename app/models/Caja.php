@@ -154,6 +154,19 @@ class Caja {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
+    // Nombres completos distintos de usuarios que ya abrieron caja alguna vez (no todos
+    // los usuarios del sistema). Usado solo como sugerencia de autocompletado (<datalist>)
+    // en el filtro "Buscar por nombre" del Historial de Cajas de Administrador.
+    public function getNombresConCaja() {
+        $query = "SELECT DISTINCT u.nombres, u.apellidos
+                  FROM " . $this->table_name . " c
+                  JOIN usuarios u ON c.usuario_id = u.id
+                  ORDER BY u.nombres, u.apellidos";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getById($caja_id) {
         $query = "SELECT c.*, u.nombres, u.apellidos 
                   FROM " . $this->table_name . " c 

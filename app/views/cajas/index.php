@@ -18,7 +18,14 @@
             <?php if (!empty($data['mostrar_filtro_nombre'])): ?>
             <div class="col-md-3">
                 <label class="form-label" style="font-size:12px;">Buscar por nombre</label>
-                <input type="text" name="nombre" class="form-control-custom" placeholder="Nombre o apellido del trabajador" value="<?php echo htmlspecialchars($data['nombre'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="text" name="nombre" class="form-control-custom" placeholder="Nombre o apellido del trabajador" value="<?php echo htmlspecialchars($data['nombre'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" list="sugerencias_nombre_trabajador">
+                <!-- Solo ayuda visual de autocompletado: el input sigue aceptando cualquier
+                     texto libre, la búsqueda LIKE del backend no cambia en nada. -->
+                <datalist id="sugerencias_nombre_trabajador">
+                    <?php foreach ($data['sugerencias_nombre'] ?? [] as $s): ?>
+                        <option value="<?php echo htmlspecialchars($s['nombres'] . ' ' . $s['apellidos'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <?php endforeach; ?>
+                </datalist>
             </div>
             <?php endif; ?>
             <div class="col-md-2">

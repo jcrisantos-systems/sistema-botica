@@ -40,6 +40,7 @@ class CajaController extends Controller {
             'estado' => $estado,
             'ignorar_fechas' => $ignorarFechas,
             'mostrar_filtro_nombre' => true,
+            'sugerencias_nombre' => $cajaModel->getNombresConCaja(),
             'ruta_filtro' => 'caja/index'
         ];
 
