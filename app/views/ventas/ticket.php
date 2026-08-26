@@ -5,32 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ticket de Venta #<?php echo htmlspecialchars($data['venta']['num_comprobante']); ?></title>
     <style>
-        body { font-family: 'Courier New', Courier, monospace; font-size: 12px; margin: 0; padding: 0; background-color: #f0f0f0; }
-        .ticket { width: 80mm; max-width: 80mm; background-color: white; margin: 0 auto; padding: 5mm; box-sizing: border-box; }
+        @page { size: 80mm auto; margin: 0; }
+
+        body {
+            font-family: 'Courier New', Courier, monospace; font-size: 12px;
+            margin: 0; padding: 20px 0; background-color: #e5e7eb;
+            display: flex; justify-content: center; box-sizing: border-box;
+        }
+        .ticket {
+            position: relative; overflow: hidden;
+            width: 72mm; max-width: 72mm; background-color: #fff;
+            padding: 3mm; box-sizing: border-box;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.18); border-radius: 4px;
+        }
         .center { text-align: center; }
         .right { text-align: right; }
         .bold { font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px; font-size: 11px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px; font-size: 11px; table-layout: fixed; }
         th { border-bottom: 1px dashed #000; border-top: 1px dashed #000; padding: 4px 0; text-align: left; }
-        td { padding: 3px 0; }
+        td { padding: 3px 0; word-wrap: break-word; overflow-wrap: break-word; }
         .divider { border-bottom: 1px dashed #000; margin: 10px 0; }
         .total-row { font-size: 14px; font-weight: bold; }
-        
-        /* Ocultar elementos en la impresión */
+
+        .anulada-banner {
+            background-color: #dc2626; color: #fff; text-align: center;
+            font-weight: bold; font-size: 11px; letter-spacing: .3px;
+            padding: 6px 4px; margin-bottom: 8px; border-radius: 3px;
+        }
+        .anulada-estado { color: #dc2626; font-weight: bold; }
+        .watermark {
+            position: absolute; top: 45%; left: 50%; width: 140%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 34px; font-weight: 800; color: rgba(220, 38, 38, 0.14);
+            text-align: center; pointer-events: none; white-space: nowrap;
+        }
+
+        /* Ajustes exclusivos de impresión */
         @media print {
-            body { background-color: white; }
+            body { background-color: #fff; padding: 0; }
             .no-print { display: none !important; }
-            .ticket { margin: 0; padding: 0; width: 100%; }
-            @page { margin: 0; }
+            .ticket { box-shadow: none; border-radius: 0; margin: 0; }
         }
     </style>
 </head>
 <body>
+    <?php $esAnulada = ($data['venta']['estado'] ?? '') === 'Anulada'; ?>
     <div class="ticket">
+        <?php if ($esAnulada): ?>
+        <div class="watermark">ANULADA</div>
+        <?php endif; ?>
+
         <div class="no-print center" style="margin-bottom: 15px;">
             <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer; background: #059669; color:#fff; border:none; font-weight:bold; border-radius: 8px;">IMPRIMIR TICKET</button>
             <button onclick="window.close()" style="padding: 10px; cursor: pointer; background: #e5e7eb; color:#333; border:none; border-radius: 8px;">X Cerrar</button>
         </div>
+
+        <?php if ($esAnulada): ?>
+        <div class="anulada-banner">COMPROBANTE ANULADO &mdash; NO V&Aacute;LIDO PARA COBRO</div>
+        <?php endif; ?>
 
         <div class="center">
             <h2 style="margin: 0; padding: 0;"><?php echo htmlspecialchars($data['config']['nombre_botica']['valor']); ?></h2>
@@ -41,12 +73,13 @@
             <?php endif; ?>
             <p style="margin: 3px 0;">--------------------------------</p>
         </div>
-        
+
         <p style="margin: 3px 0;"><span class="bold">TICKET BOLETA ELECTRÓNICA</span></p>
         <p style="margin: 3px 0;">Nro: B001-<?php echo htmlspecialchars($data['venta']['num_comprobante']); ?></p>
         <p style="margin: 3px 0;">Fecha: <?php echo date('d/m/Y H:i:s', strtotime($data['venta']['fecha_venta'])); ?></p>
         <p style="margin: 3px 0;">Cajero: <?php echo htmlspecialchars($data['venta']['cajero']); ?></p>
         <p style="margin: 3px 0;">Cliente: <?php echo htmlspecialchars($data['venta']['cliente']); ?></p>
+        <p style="margin: 3px 0;">Estado: <span class="<?php echo $esAnulada ? 'anulada-estado' : ''; ?>"><?php echo htmlspecialchars($data['venta']['estado'] ?? 'Emitida'); ?></span></p>
 
         <div class="divider"></div>
 
@@ -136,14 +169,5 @@
         
         <br>
     </div>
-    
-    <script>
-        // Auto imprimir al cargar 
-        window.onload = function() { 
-            window.print(); 
-            // window.onafterprint no es compatible en todos los navegadores, pero si lo es, cerrará la ventana automáticamente
-            window.onafterprint = function() { window.close(); }
-        }
-    </script>
 </body>
 </html>
