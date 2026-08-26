@@ -79,11 +79,13 @@
                     <i class="bi bi-receipt"></i> Historial Ventas
                 </a>
             </li>
+            <?php if(in_array($_SESSION['rol_id'], [1, 2, 3])): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>cliente/index" class="nav-link">
                     <i class="bi bi-people"></i> Clientes
                 </a>
             </li>
+            <?php endif; ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>importacion/index" class="nav-link">
                     <i class="bi bi-cloud-upload-fill"></i> Importación Masiva

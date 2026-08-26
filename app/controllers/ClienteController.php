@@ -1,6 +1,12 @@
 <?php
 class ClienteController extends Controller {
 
+    public function __construct() {
+        // Administrador (1), Farmacéutico (2) y Cajero (3) gestionan clientes;
+        // Almacenero (4) queda fuera. delete() además exige Administrador (ver más abajo).
+        $this->requireRole([1, 2, 3]);
+    }
+
     public function index() {
         if (!isset($_SESSION['user_id'])) { header('Location: ' . BASE_URL . 'auth/login'); exit; }
         
@@ -53,6 +59,7 @@ class ClienteController extends Controller {
     }
 
     public function delete($id) {
+        $this->requireAdmin();
         if (!isset($_SESSION['user_id'])) { header('Location: ' . BASE_URL . 'auth/login'); exit; }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') { header('Location: ' . BASE_URL . 'cliente/index'); exit; }
         $this->verifyCsrf();
