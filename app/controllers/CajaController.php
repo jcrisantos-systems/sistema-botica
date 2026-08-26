@@ -16,14 +16,21 @@ class CajaController extends Controller {
 
         $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-d', strtotime('-30 days'));
         $fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
+        $nombre = trim($_GET['nombre'] ?? '');
+        // '' (sin seleccionar) = todas; solo se filtra cuando el valor es literalmente '0' o '1'.
+        $estado = in_array($_GET['estado'] ?? '', ['0', '1'], true) ? (int)$_GET['estado'] : null;
 
-        $historial = $cajaModel->getHistorial($fecha_inicio, $fecha_fin);
+        $historial = $cajaModel->getHistorial($fecha_inicio, $fecha_fin, null, $estado, $nombre !== '' ? $nombre : null);
 
         $data = [
             'title' => 'Historial de Cajas',
             'historial' => $historial,
             'fecha_inicio' => $fecha_inicio,
-            'fecha_fin' => $fecha_fin
+            'fecha_fin' => $fecha_fin,
+            'nombre' => $nombre,
+            'estado' => $estado,
+            'mostrar_filtro_nombre' => true,
+            'ruta_filtro' => 'caja/index'
         ];
 
         $this->view('cajas/index', $data);
@@ -36,14 +43,18 @@ class CajaController extends Controller {
 
         $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-d', strtotime('-30 days'));
         $fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
+        $estado = in_array($_GET['estado'] ?? '', ['0', '1'], true) ? (int)$_GET['estado'] : null;
 
-        $historial = $cajaModel->getHistorial($fecha_inicio, $fecha_fin, $_SESSION['user_id']);
+        $historial = $cajaModel->getHistorial($fecha_inicio, $fecha_fin, $_SESSION['user_id'], $estado);
 
         $data = [
             'title' => 'Mi Historial de Arqueos',
             'historial' => $historial,
             'fecha_inicio' => $fecha_inicio,
-            'fecha_fin' => $fecha_fin
+            'fecha_fin' => $fecha_fin,
+            'estado' => $estado,
+            'mostrar_filtro_nombre' => false,
+            'ruta_filtro' => 'caja/historial_propio'
         ];
 
         $this->view('cajas/index', $data);
