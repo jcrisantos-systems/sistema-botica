@@ -102,4 +102,17 @@ class Controller {
             exit;
         }
     }
+
+    // Corta la ejecución si el usuario no tiene sesión iniciada o si su rol no está
+    // dentro de $rolesPermitidos (array de rol_id permitidos)
+    protected function requireRole(array $rolesPermitidos) {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . BASE_URL . 'auth/login');
+            exit;
+        }
+        if (!in_array($_SESSION['rol_id'] ?? null, $rolesPermitidos)) {
+            header('Location: ' . BASE_URL . 'auth/index');
+            exit;
+        }
+    }
 }
