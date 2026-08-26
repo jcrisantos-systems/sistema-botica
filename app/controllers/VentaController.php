@@ -201,9 +201,12 @@ class VentaController extends Controller {
 
         $modelo = $this->model('Venta');
         
-        if($modelo->anularVenta($id, $_SESSION['user_id'])) {
+        $resultado = $modelo->anularVenta($id, $_SESSION['user_id']);
+        if ($resultado === true) {
             $this->logAccion('Ventas', 'ANULAR', "Anulación de venta ID #$id por el usuario.");
             $this->flash('success', "Venta anulada correctamente. El stock ha sido devuelto al inventario.");
+        } elseif (is_array($resultado) && ($resultado['error'] ?? '') === 'caja_cerrada') {
+            $this->flash('error', "No se puede anular esta venta porque la caja del turno ya fue cerrada. Solicite al Administrador un proceso de ajuste o devolución documentada.");
         } else {
             $this->flash('error', "No se pudo anular la venta. Verifique que no esté ya anulada.");
         }

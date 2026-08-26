@@ -288,7 +288,7 @@ class Venta {
             $this->conn->beginTransaction();
 
             // 1. Verificar si ya está anulada
-            $stmtV = $this->conn->prepare("SELECT estado, tipo_comprobante, serie_comprobante, num_comprobante, id_cliente, puntos_ganados, puntos_usados FROM ventas WHERE id = :id FOR UPDATE");
+            $stmtV = $this->conn->prepare("SELECT estado, tipo_comprobante, serie_comprobante, num_comprobante, id_cliente, puntos_ganados, puntos_usados, caja_id FROM ventas WHERE id = :id FOR UPDATE");
             $stmtV->bindParam(':id', $id_venta);
             $stmtV->execute();
             $venta = $stmtV->fetch(PDO::FETCH_ASSOC);
@@ -296,6 +296,26 @@ class Venta {
             if(!$venta || $venta['estado'] == 'Anulada') {
                 $this->conn->rollBack();
                 return false;
+            }
+
+            // 1.5. Verificar que la caja del turno siga abierta. Anular una venta de un
+            // turno ya cerrado dejaría el arqueo histórico (cajas.ingresos_efectivo,
+            // monto_final_esperado, diferencia) inconsistente, sin ninguna forma de
+            // reconciliarlo. Se verifica ANTES de tocar detalles/stock/lotes/kardex/puntos,
+            // dentro de la misma transacción, para que el rollBack() sea siempre completo.
+            if (empty($venta['caja_id'])) {
+                $this->conn->rollBack();
+                return ['error' => 'caja_cerrada'];
+            }
+
+            $stmtCaja = $this->conn->prepare("SELECT estado FROM cajas WHERE id = :caja_id FOR UPDATE");
+            $stmtCaja->bindParam(':caja_id', $venta['caja_id']);
+            $stmtCaja->execute();
+            $caja = $stmtCaja->fetch(PDO::FETCH_ASSOC);
+
+            if (!$caja || (int)$caja['estado'] !== 1) {
+                $this->conn->rollBack();
+                return ['error' => 'caja_cerrada'];
             }
 
             // 2. Obtener detalles de la venta
