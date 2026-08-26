@@ -33,3 +33,18 @@
         Deny from all
     </IfModule>
 </FilesMatch>
+
+# Defensa adicional, independiente de mod_rewrite, para app/, database/, storage/ y
+# .git/: los RewriteRule de arriba ya bloquean estas rutas cuando mod_rewrite SÍ está
+# activo, pero viven dentro de <IfModule mod_rewrite.c> y no protegen nada si ese
+# módulo no está cargado (ver nota al inicio de este archivo). <If> es un directivo
+# de core (Apache 2.4+), no depende de mod_rewrite, y usa el mismo patrón
+# Require all denied / Deny from all ya usado en storage/arqueos/.htaccess.
+<If "%{REQUEST_URI} =~ m#^/(app|database|storage)(/|$)#i || %{REQUEST_URI} =~ m#^/\.git(/|$)#i">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Deny from all
+    </IfModule>
+</If>
