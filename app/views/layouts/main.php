@@ -102,7 +102,7 @@
                 </a>
             </li>
 
-            <?php if($_SESSION['rol_id'] == 1): ?>
+            <?php if(in_array($_SESSION['rol_id'], [1, 2, 4])): ?>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menuProductos" role="button" aria-expanded="false" aria-controls="menuProductos">
                     <i class="bi bi-box-seam"></i> Catálogo Maestro
@@ -110,15 +110,21 @@
                 </a>
                 <div class="collapse" id="menuProductos">
                     <ul class="nav flex-column ms-3 mt-1" style="font-size: 13px;">
+                        <?php if(in_array($_SESSION['rol_id'], [1, 2, 4])): ?>
                         <li class="nav-item">
                             <a href="<?php echo BASE_URL; ?>producto/index" class="nav-link"><i class="bi bi-circle"></i> Productos</a>
                         </li>
+                        <?php endif; ?>
+                        <?php if(in_array($_SESSION['rol_id'], [1, 4])): ?>
                         <li class="nav-item">
                             <a href="<?php echo BASE_URL; ?>categoria/index" class="nav-link"><i class="bi bi-circle"></i> Categorías</a>
                         </li>
+                        <?php endif; ?>
+                        <?php if(in_array($_SESSION['rol_id'], [1, 4])): ?>
                         <li class="nav-item">
                             <a href="<?php echo BASE_URL; ?>laboratorio/index" class="nav-link"><i class="bi bi-circle"></i> Laboratorios</a>
                         </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </li>

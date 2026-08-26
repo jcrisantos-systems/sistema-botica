@@ -2,7 +2,7 @@
 class LaboratorioController extends Controller {
 
     public function __construct() {
-        $this->requireAdmin();
+        $this->requireRole([1, 4]);
     }
 
     public function index() {
@@ -39,6 +39,7 @@ class LaboratorioController extends Controller {
     }
 
     public function delete($id) {
+        $this->requireAdmin();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') { header('Location: ' . BASE_URL . 'laboratorio/index'); exit; }
         $this->verifyCsrf();
 
