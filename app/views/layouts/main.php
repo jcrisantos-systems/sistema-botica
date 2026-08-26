@@ -61,6 +61,10 @@
                         <li class="nav-item">
                             <a href="<?php echo BASE_URL; ?>caja/index" class="nav-link"><i class="bi bi-circle"></i> Historial Arqueos</a>
                         </li>
+                        <?php else: ?>
+                        <li class="nav-item">
+                            <a href="<?php echo BASE_URL; ?>caja/historial_propio" class="nav-link"><i class="bi bi-circle"></i> Historial Arqueos</a>
+                        </li>
                         <?php endif; ?>
                     </ul>
                 </div>

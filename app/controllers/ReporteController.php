@@ -56,7 +56,7 @@ class ReporteController extends Controller {
         // UTF-8 BOM para soporte en Excel
         fwrite($output, "\xEF\xBB\xBF");
         
-        fputcsv($output, ['ID Venta', 'Fecha', 'Cajero', 'Cliente', 'Doc', 'Numero', 'Subtotal', 'IGV', 'Total', 'Forma Pago']);
+        fputcsv($output, ['ID Venta', 'Fecha', 'Cajero', 'Cliente', 'Doc', 'Numero', 'Subtotal', 'IGV', 'Total', 'Forma Pago'], ";");
         
         foreach($filtradas as $v) {
             fputcsv($output, [
@@ -85,7 +85,7 @@ class ReporteController extends Controller {
         
         $output = fopen("php://output", "w");
         fwrite($output, "\xEF\xBB\xBF");
-        fputcsv($output, ['Producto', 'Lote', 'Fecha Vencimiento', 'Stock', 'Dias Restantes']);
+        fputcsv($output, ['Producto', 'Lote', 'Fecha Vencimiento', 'Stock', 'Dias Restantes'], ";");
         
         $hoy = new DateTime();
         foreach($lotes as $l) {

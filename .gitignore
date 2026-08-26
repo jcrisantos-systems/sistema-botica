@@ -20,6 +20,12 @@ app/config/mysqldump_path.txt
 storage/imports/*
 !storage/imports/.gitkeep
 
+# Copias HTML del ticket de arqueo generadas al cerrar caja (CajaController::ticket_arqueo):
+# contienen datos reales de la botica, no deben subirse al repositorio.
+storage/arqueos/*
+!storage/arqueos/.gitkeep
+!storage/arqueos/.htaccess
+
 # Archivos de sistema operativo / editor
 .DS_Store
 Thumbs.db

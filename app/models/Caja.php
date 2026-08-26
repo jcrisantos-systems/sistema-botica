@@ -103,15 +103,24 @@ class Caja {
         return $stmt->execute();
     }
     
-    public function getHistorial($fecha_inicio, $fecha_fin) {
-        $query = "SELECT c.*, u.nombres, u.apellidos 
-                  FROM " . $this->table_name . " c 
-                  JOIN usuarios u ON c.usuario_id = u.id 
-                  WHERE DATE(c.fecha_apertura) >= :inicio AND DATE(c.fecha_apertura) <= :fin 
-                  ORDER BY c.id DESC";
+    // $usuario_id opcional: si se pasa, restringe el historial a un solo usuario (usado
+    // para que un Cajero/Farmacéutico/Almacenero vea solo sus propios arqueos).
+    public function getHistorial($fecha_inicio, $fecha_fin, $usuario_id = null) {
+        $query = "SELECT c.*, u.nombres, u.apellidos
+                  FROM " . $this->table_name . " c
+                  JOIN usuarios u ON c.usuario_id = u.id
+                  WHERE DATE(c.fecha_apertura) >= :inicio AND DATE(c.fecha_apertura) <= :fin";
+        if ($usuario_id !== null) {
+            $query .= " AND c.usuario_id = :usuario_id";
+        }
+        $query .= " ORDER BY c.id DESC";
+
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':inicio', $fecha_inicio);
         $stmt->bindParam(':fin', $fecha_fin);
+        if ($usuario_id !== null) {
+            $stmt->bindParam(':usuario_id', $usuario_id);
+        }
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

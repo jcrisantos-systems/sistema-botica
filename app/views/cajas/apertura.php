@@ -4,9 +4,26 @@
         <div class="page-subtitle">Ingrese el monto base de sencillo con el que iniciará su turno.</div>
     </div>
 
+    <?php if (isset($_SESSION['mensaje'])): ?>
+        <div class="alert alert-success mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span><i class="bi bi-check-circle"></i> <?php echo htmlspecialchars($_SESSION['mensaje'], ENT_QUOTES, 'UTF-8'); ?></span>
+            <?php if (isset($_SESSION['ultimo_cierre_id'])): ?>
+                <a href="<?php echo BASE_URL; ?>caja/ticket_arqueo/<?php echo (int)$_SESSION['ultimo_cierre_id']; ?>" target="_blank" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-printer"></i> Ver ticket de cierre
+                </a>
+            <?php endif; ?>
+        </div>
+        <?php unset($_SESSION['mensaje']); unset($_SESSION['ultimo_cierre_id']); ?>
+    <?php endif; ?>
     <?php if (isset($_SESSION['error'])): ?>
         <div class="alert alert-danger mb-4"><?php echo htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8'); unset($_SESSION['error']); ?></div>
     <?php endif; ?>
+
+    <div class="text-center mb-3">
+        <a href="<?php echo BASE_URL; ?>caja/historial_propio" style="font-size: 13px; color: var(--text-secondary);">
+            <i class="bi bi-clock-history"></i> Ver mi historial de arqueos
+        </a>
+    </div>
 
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-4">
