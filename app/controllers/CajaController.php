@@ -2,10 +2,10 @@
 class CajaController extends Controller {
 
     public function __construct() {
-        if (!isset($_SESSION['user_id'])) {
-            header('Location: ' . BASE_URL . 'auth/login');
-            exit;
-        }
+        // Administrador (1), Farmacéutico (2) y Cajero (3) operan Caja; Almacenero (4)
+        // queda excluido de todas las acciones (apertura, cierre, movimientos, arqueos
+        // propios o ajenos). index() además exige requireAdmin() como capa redundante.
+        $this->requireRole([1, 2, 3]);
     }
 
     public function index() {

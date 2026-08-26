@@ -44,6 +44,7 @@
                 </a>
             </li>
             <?php endif; ?>
+            <?php if(in_array($_SESSION['rol_id'], [1, 2, 3])): ?>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menuCaja" role="button" aria-expanded="false" aria-controls="menuCaja" style="color: #ff9800;">
                     <i class="bi bi-box-arrow-in-right"></i> Gestión de Caja
@@ -74,6 +75,7 @@
                     <i class="bi bi-cart-fill"></i> PUNTO DE VENTA (POS)
                 </a>
             </li>
+            <?php endif; ?>
             <?php if(in_array($_SESSION['rol_id'], [1, 2])): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>venta/index" class="nav-link">

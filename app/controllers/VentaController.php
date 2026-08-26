@@ -2,8 +2,8 @@
 class VentaController extends Controller {
 
     public function pos() {
-        if (!isset($_SESSION['user_id'])) { header('Location: ' . BASE_URL . 'auth/login'); exit; }
-        
+        $this->requireRole([1, 2, 3]);
+
         $cajaModel = $this->model('Caja');
         $cajaAbierta = $cajaModel->getCajaAbiertaPorUsuario($_SESSION['user_id']);
         if (!$cajaAbierta) {
@@ -92,6 +92,13 @@ class VentaController extends Controller {
         // Sesión y CSRF primero: si la sesión expiró, el frontend debe pedir reautenticación
         // en vez de mostrar un error genérico de token.
         $this->verifyCsrfJson();
+
+        // Rol autorizado a vender (Administrador, Farmacéutico, Cajero); Almacenero no.
+        // No se usa requireRole() porque hace un redirect: este endpoint es consumido por
+        // fetch() y siempre debe responder JSON.
+        if (!in_array($_SESSION['rol_id'] ?? null, [1, 2, 3])) {
+            $this->jsonError(403, 'rol_no_autorizado', 'Tu rol no tiene permiso para registrar ventas.');
+        }
 
         if (!isset($_POST['id_cliente'])) {
             $this->jsonError(400, 'bad_request', 'Datos de venta incompletos.');
