@@ -74,11 +74,19 @@
                     <i class="bi bi-cart-fill"></i> PUNTO DE VENTA (POS)
                 </a>
             </li>
+            <?php if(in_array($_SESSION['rol_id'], [1, 2])): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>venta/index" class="nav-link">
                     <i class="bi bi-receipt"></i> Historial Ventas
                 </a>
             </li>
+            <?php elseif($_SESSION['rol_id'] == 3): ?>
+            <li class="nav-item">
+                <a href="<?php echo BASE_URL; ?>venta/historial_propio" class="nav-link">
+                    <i class="bi bi-receipt"></i> Historial Ventas
+                </a>
+            </li>
+            <?php endif; ?>
             <?php if(in_array($_SESSION['rol_id'], [1, 2, 3])): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>cliente/index" class="nav-link">

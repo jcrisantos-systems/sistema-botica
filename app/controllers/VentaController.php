@@ -29,9 +29,18 @@ class VentaController extends Controller {
     }
     
     public function index() {
-        if (!isset($_SESSION['user_id'])) { header('Location: ' . BASE_URL . 'auth/login'); exit; }
+        $this->requireRole([1, 2]);
         $modelo = $this->model('Venta');
         $this->view('ventas/index', ['title' => 'Historial de Ventas', 'ventas' => $modelo->getAll()]);
+    }
+
+    // Historial propio: solo Cajero (rol_id = 3), a diferencia de index(), que es el
+    // listado completo para Administrador/Farmacéutico. Mismo patrón que
+    // CajaController::historial_propio(), reutilizando la vista ventas/index.
+    public function historial_propio() {
+        $this->requireRole([3]);
+        $modelo = $this->model('Venta');
+        $this->view('ventas/index', ['title' => 'Mis Ventas', 'ventas' => $modelo->getAll($_SESSION['user_id'])]);
     }
 
     public function ticket($id) {
@@ -53,7 +62,7 @@ class VentaController extends Controller {
         // registró esta venta específica (venta.id_usuario) pueden ver su ticket. No basta
         // con estar autenticado ni con ocultar el enlace en el menú.
         $esDueno = isset($venta_actual['id_usuario']) && $venta_actual['id_usuario'] == $_SESSION['user_id'];
-        if (($_SESSION['rol_id'] ?? null) != 1 && !$esDueno) {
+        if (!in_array($_SESSION['rol_id'] ?? null, [1, 2]) && !$esDueno) {
             header('Location: ' . BASE_URL . 'auth/index');
             exit;
         }

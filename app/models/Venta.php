@@ -7,13 +7,17 @@ class Venta {
         $this->conn = $db->getConnection();
     }
 
-    public function getAll() {
-        $query = "SELECT v.*, c.nombres as cliente, u.nombres as cajero 
-                  FROM ventas v 
-                  INNER JOIN clientes c ON v.id_cliente = c.id 
-                  INNER JOIN usuarios u ON v.id_usuario = u.id 
-                  ORDER BY v.id DESC LIMIT 1000";
+    public function getAll($usuario_id = null) {
+        $whereUsuario = $usuario_id !== null ? "WHERE v.id_usuario = :usuario_id " : "";
+        $query = "SELECT v.*, c.nombres as cliente, u.nombres as cajero
+                  FROM ventas v
+                  INNER JOIN clientes c ON v.id_cliente = c.id
+                  INNER JOIN usuarios u ON v.id_usuario = u.id
+                  {$whereUsuario}ORDER BY v.id DESC LIMIT 1000";
         $stmt = $this->conn->prepare($query);
+        if ($usuario_id !== null) {
+            $stmt->bindParam(':usuario_id', $usuario_id);
+        }
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
