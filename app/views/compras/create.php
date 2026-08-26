@@ -11,8 +11,9 @@
         const productosData = <?php echo json_encode($data['productos']); ?>;
     </script>
 
-    <form action="<?php echo BASE_URL; ?>compra/save" method="POST" id="formCompra">
+    <form action="<?php echo BASE_URL; ?>compra/save" method="POST" id="formCompra" onsubmit="return bloquearReenvioCompra(this);">
         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+        <input type="hidden" name="form_token" value="<?php echo htmlspecialchars($data['form_token'], ENT_QUOTES, 'UTF-8'); ?>">
         <!-- CABECERA -->
         <div class="card-metric mb-4">
             <h5 class="section-title">Datos del Documento y Proveedor</h5>
@@ -230,4 +231,15 @@ function calcularTotales() {
 window.onload = function() {
     agregarFila();
 };
+
+// Deshabilita el botón de envío al hacer submit, para evitar doble clic / doble envío.
+// Es solo una capa de UX: la protección real contra reenvío está en el backend
+// (CompraController::save(), token de un solo uso por formulario).
+function bloquearReenvioCompra(form) {
+    let btn = document.getElementById('btnSubmit');
+    if (btn.disabled) return false; // ya se envió una vez, ignorar clics/submits extra
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
+    return true;
+}
 </script>

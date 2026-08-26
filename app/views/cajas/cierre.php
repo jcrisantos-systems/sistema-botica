@@ -5,10 +5,10 @@
     </div>
 
     <?php if (isset($_SESSION['mensaje'])): ?>
-        <div class="alert alert-success mb-4"><i class="bi bi-check-circle"></i> <?php echo $_SESSION['mensaje']; unset($_SESSION['mensaje']); ?></div>
+        <div class="alert alert-success mb-4"><i class="bi bi-check-circle"></i> <?php echo htmlspecialchars($_SESSION['mensaje'], ENT_QUOTES, 'UTF-8'); unset($_SESSION['mensaje']); ?></div>
     <?php endif; ?>
     <?php if (isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger mb-4"><i class="bi bi-x-circle"></i> <?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+        <div class="alert alert-danger mb-4"><i class="bi bi-x-circle"></i> <?php echo htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8'); unset($_SESSION['error']); ?></div>
     <?php endif; ?>
 
     <div class="row">

@@ -5,7 +5,7 @@
     </div>
 
     <?php if (isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger mb-4"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+        <div class="alert alert-danger mb-4"><?php echo htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8'); unset($_SESSION['error']); ?></div>
     <?php endif; ?>
 
     <div class="row justify-content-center">

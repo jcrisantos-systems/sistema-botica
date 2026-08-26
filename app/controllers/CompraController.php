@@ -19,14 +19,22 @@ class CompraController extends Controller {
         
         $provModel = $this->model('Proveedor');
         $prodModel = $this->model('Producto');
-        
+
+        // Token de un solo uso por carga de formulario (distinto del CSRF general): protege
+        // contra doble envío (doble clic / reenvío) a nivel de backend, aprovechando que PHP
+        // serializa las peticiones de una misma sesión (lock del archivo de sesión), así que
+        // la segunda petición casi simultánea espera a que la primera consuma y borre este
+        // token antes de poder leerlo.
+        $_SESSION['compra_form_token'] = bin2hex(random_bytes(16));
+
         $data = [
             'title' => 'Registrar Nueva Compra',
             'proveedores' => $provModel->getAll(),
             // Productos se cargarán en JS, o los pasamos todos para un array rápido
-            'productos' => $prodModel->getAll()
+            'productos' => $prodModel->getAll(),
+            'form_token' => $_SESSION['compra_form_token']
         ];
-        
+
         $this->view('compras/create', $data);
     }
     
@@ -66,47 +74,118 @@ class CompraController extends Controller {
             $this->verifyCsrf();
             $modelo = $this->model('Compra');
 
-            // 1. Cabecera
+            // Paso 1: el form_token debe existir y coincidir, pero NO se consume todavía.
+            // Verificarlo temprano sigue bloqueando un reenvío casi simultáneo (doble clic):
+            // PHP mantiene bloqueada la sesión (session_start en public/index.php) durante
+            // toda la petición, así que una segunda petición de la misma sesión queda
+            // esperando ese lock hasta que ésta termine — para entonces el token ya habrá
+            // sido consumido (paso 6) o seguirá intacto si esta petición fue rechazada.
+            $formToken = $_POST['form_token'] ?? '';
+            if (empty($_SESSION['compra_form_token']) || !hash_equals($_SESSION['compra_form_token'], $formToken)) {
+                $this->flash('error', "Esta compra ya fue enviada anteriormente o el formulario expiró. Si no aparece en el Historial de Compras, vuelve a completarla desde \"Nueva Compra\".");
+                header('Location: ' . BASE_URL . 'compra/index');
+                exit;
+            }
+
+            // Paso 2: validar TODOS los datos de entrada antes de tocar la BD o el token.
+            $tiposValidos = ['Factura', 'Boleta', 'Guia Remision'];
+            $tipoComprobante = trim($_POST['tipo_comprobante'] ?? '');
+            $serieComprobante = trim($_POST['serie_comprobante'] ?? '');
+            $numComprobante = trim($_POST['num_comprobante'] ?? '');
+            $idProveedor = (int)($_POST['id_proveedor'] ?? 0);
+            $fechaCompra = trim($_POST['fecha_compra'] ?? '');
+
+            $errorValidacion = null;
+            if ($idProveedor <= 0) {
+                $errorValidacion = "Debes seleccionar un proveedor válido.";
+            } elseif (!in_array($tipoComprobante, $tiposValidos, true)) {
+                $errorValidacion = "Tipo de comprobante no válido.";
+            } elseif ($serieComprobante === '' || $numComprobante === '') {
+                $errorValidacion = "Debes indicar la serie y el número del comprobante de la compra.";
+            } elseif ($fechaCompra === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $fechaCompra)) {
+                $errorValidacion = "Debes indicar una fecha de emisión válida.";
+            }
+
+            // Detalles de los productos (llegan en arrays paralelos); se validan cantidades
+            // y precios como parte del mismo paso, antes de decidir si el token se consume.
+            $detalles = [];
+            if ($errorValidacion === null) {
+                $productos = $_POST['producto_id'] ?? [];
+                foreach ($productos as $i => $id_prod) {
+                    if (empty($id_prod) || empty($_POST['cantidad'][$i])) continue;
+
+                    $cantidad = (int)$_POST['cantidad'][$i];
+                    $precioUnitario = (float)($_POST['precio_c_unitario'][$i] ?? 0);
+                    if ($cantidad <= 0 || $precioUnitario < 0) {
+                        $errorValidacion = "Cada producto debe tener una cantidad mayor a cero y un precio válido.";
+                        break;
+                    }
+
+                    $detalles[] = [
+                        'id_producto' => (int)$id_prod,
+                        'cantidad' => $cantidad,
+                        'precio_unitario' => $precioUnitario,
+                        'subtotal' => (float)($_POST['subtotal'][$i] ?? 0),
+                        'lote' => $_POST['lote'][$i] ?? '',
+                        'vencimiento' => $_POST['vencimiento'][$i] ?? '',
+                        'actualizar_precio' => isset($_POST['actualizar_precio']) ? 1 : 0
+                    ];
+                }
+                if ($errorValidacion === null && count($detalles) === 0) {
+                    $errorValidacion = "Debe agregar al menos un producto.";
+                }
+            }
+
+            // Paso 3: duplicado de comprobante (proveedor+tipo+serie+número). No existe
+            // todavía un UNIQUE de BD para esto en este entorno de prueba (pendiente de que
+            // termine de validarse en botica_db_test_restore antes de aplicarlo en real).
+            if ($errorValidacion === null && $modelo->existeComprobante($idProveedor, $tipoComprobante, $serieComprobante, $numComprobante)) {
+                $errorValidacion = "Ya existe una compra registrada con el comprobante {$tipoComprobante} {$serieComprobante}-{$numComprobante} para este proveedor.";
+            }
+
+            if ($errorValidacion !== null) {
+                // El formulario no procesó nada: se conserva el form_token vigente en sesión
+                // (no se toca) para que el usuario pueda corregir el dato y reenviar sin
+                // necesidad de recargar "Nueva Compra". El botón ya deshabilitado por JS se
+                // reactiva solo al volver a cargar la página con el mensaje de error.
+                $this->flash('error', $errorValidacion);
+                header('Location: ' . BASE_URL . 'compra/index');
+                exit;
+            }
+
+            // Paso 4: intentar registrar la compra (transacción propia del modelo).
             $cabecera = [
-                'id_proveedor' => (int)$_POST['id_proveedor'],
-                'tipo_comprobante' => $_POST['tipo_comprobante'],
-                'serie_comprobante' => $_POST['serie_comprobante'],
-                'num_comprobante' => $_POST['num_comprobante'],
-                'fecha_compra' => $_POST['fecha_compra'],
+                'id_proveedor' => $idProveedor,
+                'tipo_comprobante' => $tipoComprobante,
+                'serie_comprobante' => $serieComprobante,
+                'num_comprobante' => $numComprobante,
+                'fecha_compra' => $fechaCompra,
                 'impuesto' => (float)($_POST['impuesto'] ?? 0.00),
-                'total' => (float)$_POST['total_compra'],
+                'total' => (float)($_POST['total_compra'] ?? 0),
                 'estado' => $_POST['estado'] ?? 'Completada'
             ];
-            
-            // 2. Detalles de los productos (llegan en arrays paralelos)
-            $detalles = [];
-            $productos = $_POST['producto_id'] ?? [];
-            foreach ($productos as $i => $id_prod) {
-                // si el json o el ajax envió vacíos se filtran
-                if (empty($id_prod) || empty($_POST['cantidad'][$i])) continue;
-                
-                $detalles[] = [
-                    'id_producto' => (int)$id_prod,
-                    'cantidad' => (int)$_POST['cantidad'][$i],
-                    'precio_unitario' => (float)$_POST['precio_c_unitario'][$i],
-                    'subtotal' => (float)$_POST['subtotal'][$i],
-                    'lote' => $_POST['lote'][$i],
-                    'vencimiento' => $_POST['vencimiento'][$i],
-                    'actualizar_precio' => isset($_POST['actualizar_precio']) ? 1 : 0
-                ];
-            }
-            
-            if (count($detalles) > 0) {
-                $resultado = $modelo->registrarCompra($cabecera, $detalles, $_SESSION['user_id']);
-                if ($resultado) {
-                    $logMsg = ($cabecera['estado'] == 'Pendiente') ? "Registro de Orden de Compra Pendiente" : "Registro de Compra con Ingreso Directo";
-                    $this->logAccion('Compras', 'CREAR', "$logMsg. Prov: " . $_POST['id_proveedor'] . ", Total: " . $cabecera['total'], $cabecera['total']);
-                    $this->flash('success', "Compra y Lotes generados correctamente.");
-                } else {
-                    $this->flash('error', "No se pudo registrar la compra. Verifica los datos ingresados e intenta nuevamente.");
-                }
+
+            $resultado = $modelo->registrarCompra($cabecera, $detalles, $_SESSION['user_id']);
+
+            if ($resultado) {
+                // Paso 5: SOLO ahora, con la compra ya confirmada en BD, se consume el
+                // form_token y se rota el CSRF general, para que un reenvío posterior del
+                // mismo formulario (o una petición concurrente que estuviera esperando el
+                // lock de sesión) sea rechazado.
+                unset($_SESSION['compra_form_token']);
+                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+                // Se deja lista una nueva llave por si el frontend reutiliza esta misma
+                // página sin recargar; "Nueva Compra" (create()) siempre genera la suya.
+                $_SESSION['compra_form_token'] = bin2hex(random_bytes(16));
+
+                $logMsg = ($cabecera['estado'] == 'Pendiente') ? "Registro de Orden de Compra Pendiente" : "Registro de Compra con Ingreso Directo";
+                $this->logAccion('Compras', 'CREAR', "$logMsg. Prov: " . $idProveedor . ", Total: " . $cabecera['total'], $cabecera['total']);
+                $this->flash('success', "Compra y Lotes generados correctamente.");
             } else {
-                $this->flash('error', "Debe agregar al menos un producto.");
+                // La compra falló dentro de su propia transacción (rollback ya aplicado por
+                // el modelo): se conserva el form_token vigente para permitir un reintento
+                // legítimo sin duplicar el registro exitosamente creado (porque no se creó).
+                $this->flash('error', "No se pudo registrar la compra. Verifica los datos ingresados e intenta nuevamente.");
             }
         }
         header('Location: ' . BASE_URL . 'compra/index');

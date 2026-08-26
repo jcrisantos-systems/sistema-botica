@@ -17,14 +17,25 @@ class ClienteController extends Controller {
             $this->verifyCsrf();
             $modelo = $this->model('Cliente');
             $data = [
-                'tipo_documento' => $_POST['tipo_documento'],
-                'num_documento' => $_POST['num_documento'],
-                'nombres' => $_POST['nombres'],
-                'telefono' => $_POST['telefono'],
-                'direccion' => $_POST['direccion'],
+                'tipo_documento' => trim($_POST['tipo_documento']),
+                'num_documento' => trim($_POST['num_documento']),
+                'nombres' => trim($_POST['nombres']),
+                'telefono' => trim($_POST['telefono']),
+                'direccion' => trim($_POST['direccion']),
                 'id' => $_POST['id'] ?? null
             ];
-            
+
+            // Validación backend de duplicados por (tipo_documento, num_documento). No existe
+            // todavía un UNIQUE de BD para esto (pendiente de Fase F, tras depurar los
+            // duplicados históricos ya detectados) — este chequeo previene que se sigan
+            // creando duplicados nuevos, sin tocar ni bloquear los registros existentes.
+            $excludeId = empty($data['id']) ? null : $data['id'];
+            if ($modelo->existeCliente($data['tipo_documento'], $data['num_documento'], $excludeId)) {
+                $this->flash('error', "Ya existe un cliente registrado con el documento {$data['tipo_documento']} {$data['num_documento']}. Verifica el Directorio de Clientes antes de crear uno nuevo.");
+                header('Location: ' . BASE_URL . 'cliente/index');
+                exit;
+            }
+
             try {
                 if (empty($data['id'])) {
                     $modelo->create($data);

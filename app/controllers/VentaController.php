@@ -36,19 +36,28 @@ class VentaController extends Controller {
 
     public function ticket($id) {
         if (!isset($_SESSION['user_id'])) { header('Location: ' . BASE_URL . 'auth/login'); exit; }
-        
+
         $modelo = $this->model('Venta');
         $ventas = $modelo->getAll();
-        
+
         $venta_actual = null;
         foreach($ventas as $v) {
             if($v['id'] == $id) {
                 $venta_actual = $v; break;
             }
         }
-        
+
         if(!$venta_actual) die("Ticket no encontrado.");
-        
+
+        // Autorización por recurso (evita IDOR): solo el Administrador o el cajero que
+        // registró esta venta específica (venta.id_usuario) pueden ver su ticket. No basta
+        // con estar autenticado ni con ocultar el enlace en el menú.
+        $esDueno = isset($venta_actual['id_usuario']) && $venta_actual['id_usuario'] == $_SESSION['user_id'];
+        if (($_SESSION['rol_id'] ?? null) != 1 && !$esDueno) {
+            header('Location: ' . BASE_URL . 'auth/index');
+            exit;
+        }
+
         $detalles = $modelo->getDetalles($id);
         $configModel = $this->model('Configuracion');
         
@@ -111,15 +120,14 @@ class VentaController extends Controller {
         $puntos_usados = isset($_POST['puntos_usados']) ? (int)$_POST['puntos_usados'] : 0;
         $descuento = isset($_POST['descuento_venta']) ? (float)$_POST['descuento_venta'] : 0.00;
 
-        // Generar un número ficticio correlativo de ticket
-        $numero_t = str_pad(rand(1000, 99999), 6, '0', STR_PAD_LEFT);
-
+        // El número de comprobante NUNCA se toma del navegador: Venta::registrarVenta()
+        // lo genera internamente con un correlativo transaccional real (tabla
+        // venta_correlativos), bajo lock, dentro de la misma transacción de la venta.
         $cabecera = [
             'caja_id' => $cajaAbierta['id'],
             'id_cliente' => $id_cliente,
             'tipo_comprobante' => $_POST['tipo_comprobante'],
             'serie_comprobante' => 'T001',
-            'num_comprobante' => $numero_t,
             'subtotal' => (float)$_POST['subtotal_venta'],
             'descuento' => $descuento,
             'igv' => (float)$_POST['igv_venta'],
@@ -151,23 +159,25 @@ class VentaController extends Controller {
         }
 
         // registrarVenta() ya envuelve la inserción de la cabecera, el descuento FEFO por
-        // lote, la actualización de stock y el registro en Kardex en una única transacción
+        // lote, la actualización de stock, el registro en Kardex, el correlativo del
+        // comprobante Y la actualización de puntos de fidelización en una única transacción
         // (beginTransaction/commit/rollBack en app/models/Venta.php) para que nada quede a
-        // medias si algo falla a mitad de camino.
+        // medias si algo falla a mitad de camino — incluidos los puntos, que ya NO se tocan
+        // aquí después del commit (antes se hacía así, con una conexión/instancia de
+        // Cliente aparte, fuera de la transacción de la venta).
         $modelo = $this->model('Venta');
-        $id_venta = $modelo->registrarVenta($cabecera, $detalles, $_SESSION['user_id']);
+        $resultado = $modelo->registrarVenta($cabecera, $detalles, $_SESSION['user_id']);
 
-        if (!$id_venta) {
-            $this->jsonError(409, 'stock_insuficiente', 'Stock insuficiente o conflicto de lote FEFO. La venta no fue registrada.');
+        if (!isset($resultado['id_venta'])) {
+            $mensaje = $resultado['error'] ?? 'Stock insuficiente o conflicto de lote FEFO. La venta no fue registrada.';
+            $this->jsonError(409, 'venta_rechazada', $mensaje);
         }
 
-        if ($id_cliente != 1) {
-            $cliModel = $this->model('Cliente');
-            $delta = $puntos_ganados - $puntos_usados;
-            $cliModel->actualizarPuntos($id_cliente, $delta);
-        }
+        $id_venta = $resultado['id_venta'];
+        $numComprobante = $resultado['num_comprobante'];
+        $ticketLabel = $cabecera['serie_comprobante'] . '-' . $numComprobante;
 
-        $this->logAccion('Ventas', 'CREAR', "Venta {$cabecera['tipo_comprobante']} T001-{$numero_t} registrada.", $total);
+        $this->logAccion('Ventas', 'CREAR', "Venta {$cabecera['tipo_comprobante']} {$ticketLabel} registrada.", $total);
 
         // Rotar el token CSRF tras la operación exitosa; el frontend lo toma de la respuesta
         // y lo reutiliza en la siguiente venta sin necesidad de recargar la página.
@@ -176,8 +186,8 @@ class VentaController extends Controller {
         echo json_encode([
             'success' => true,
             'id_venta' => $id_venta,
-            'ticket' => "T001-{$numero_t}",
-            'mensaje' => "Venta procesada exitosamente. Ticket #T001-{$numero_t}",
+            'ticket' => $ticketLabel,
+            'mensaje' => "Venta procesada exitosamente. Ticket #{$ticketLabel}",
             'csrf_token' => $_SESSION['csrf_token']
         ]);
         exit;

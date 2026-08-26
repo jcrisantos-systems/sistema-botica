@@ -30,6 +30,21 @@ class Compra {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Verifica si ya existe una compra con el mismo proveedor+tipo+serie+número de
+    // comprobante (columna sin UNIQUE en BD todavía; pendiente de Fase D). Complementa,
+    // no reemplaza, la protección de doble envío basada en form_token de
+    // CompraController::save().
+    public function existeComprobante($idProveedor, $tipo, $serie, $num) {
+        $query = "SELECT 1 FROM compras WHERE id_proveedor = :prov AND tipo_comprobante = :tipo AND serie_comprobante = :serie AND num_comprobante = :num LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':prov', $idProveedor);
+        $stmt->bindParam(':tipo', $tipo);
+        $stmt->bindParam(':serie', $serie);
+        $stmt->bindParam(':num', $num);
+        $stmt->execute();
+        return $stmt->fetchColumn() !== false;
+    }
+
     public function getCompraPorId($id) {
         $query = "SELECT c.*, p.razon_social as proveedor 
                   FROM compras c 
