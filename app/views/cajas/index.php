@@ -30,6 +30,12 @@
                     <option value="0" <?php echo $estadoActual === 0 ? 'selected' : ''; ?>>Cerrada</option>
                 </select>
             </div>
+            <div class="col-md-3 d-flex align-items-center">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="ignorar_fechas" name="ignorar_fechas" value="1" <?php echo !empty($data['ignorar_fechas']) ? 'checked' : ''; ?>>
+                    <label class="form-check-label" for="ignorar_fechas" style="font-size:12px;">Buscar en todo el historial (ignorar fechas)</label>
+                </div>
+            </div>
             <div class="col-md-2">
                 <button type="submit" class="btn-primary-custom" style="width:100%;">
                     <i class="bi bi-search"></i> Buscar
@@ -110,7 +116,12 @@
                         
                         <?php if(empty($data['historial'])): ?>
                             <tr>
-                                <td colspan="10" class="text-center text-muted py-4">No hay registros de caja para las fechas seleccionadas.</td>
+                                <td colspan="10" class="text-center text-muted py-4">
+                                    No hay registros de caja para las fechas seleccionadas.
+                                    <?php if (empty($data['ignorar_fechas']) && !empty($data['nombre'])): ?>
+                                        <br><small class="d-block mt-2">¿No encontraste lo que buscabas? Prueba marcando "Buscar en todo el historial" para ignorar el rango de fechas.</small>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

@@ -103,6 +103,8 @@ class Caja {
         return $stmt->execute();
     }
     
+    // $fecha_inicio/$fecha_fin opcionales: null en cualquiera de los dos = sin filtro de
+    // fecha (usado por el checkbox "Buscar en todo el historial" de cajas/index.php).
     // $usuario_id opcional: si se pasa, restringe el historial a un solo usuario (usado
     // para que un Cajero/Farmacéutico/Almacenero vea solo sus propios arqueos).
     // $estado opcional: 1 (abiertas), 0 (cerradas) o null (todas).
@@ -110,25 +112,34 @@ class Caja {
     // cajero (LIKE preparado, nunca concatenado directo). La colación utf8mb4_unicode_ci
     // ya existente en usuarios.nombres/apellidos pliega mayúsculas/minúsculas y tildes
     // (mismo criterio ya verificado y documentado para categorias.nombre en fase12).
-    public function getHistorial($fecha_inicio, $fecha_fin, $usuario_id = null, $estado = null, $nombre = null) {
+    public function getHistorial($fecha_inicio = null, $fecha_fin = null, $usuario_id = null, $estado = null, $nombre = null) {
         $query = "SELECT c.*, u.nombres, u.apellidos
                   FROM " . $this->table_name . " c
-                  JOIN usuarios u ON c.usuario_id = u.id
-                  WHERE DATE(c.fecha_apertura) >= :inicio AND DATE(c.fecha_apertura) <= :fin";
+                  JOIN usuarios u ON c.usuario_id = u.id";
+
+        $condiciones = [];
+        if ($fecha_inicio !== null && $fecha_fin !== null) {
+            $condiciones[] = "DATE(c.fecha_apertura) >= :inicio AND DATE(c.fecha_apertura) <= :fin";
+        }
         if ($usuario_id !== null) {
-            $query .= " AND c.usuario_id = :usuario_id";
+            $condiciones[] = "c.usuario_id = :usuario_id";
         }
         if ($estado !== null) {
-            $query .= " AND c.estado = :estado";
+            $condiciones[] = "c.estado = :estado";
         }
         if ($nombre !== null && $nombre !== '') {
-            $query .= " AND CONCAT(u.nombres, ' ', u.apellidos) LIKE :nombre";
+            $condiciones[] = "CONCAT(u.nombres, ' ', u.apellidos) LIKE :nombre";
+        }
+        if (!empty($condiciones)) {
+            $query .= " WHERE " . implode(" AND ", $condiciones);
         }
         $query .= " ORDER BY c.id DESC";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':inicio', $fecha_inicio);
-        $stmt->bindParam(':fin', $fecha_fin);
+        if ($fecha_inicio !== null && $fecha_fin !== null) {
+            $stmt->bindParam(':inicio', $fecha_inicio);
+            $stmt->bindParam(':fin', $fecha_fin);
+        }
         if ($usuario_id !== null) {
             $stmt->bindParam(':usuario_id', $usuario_id);
         }

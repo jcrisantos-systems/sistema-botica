@@ -19,8 +19,17 @@ class CajaController extends Controller {
         $nombre = trim($_GET['nombre'] ?? '');
         // '' (sin seleccionar) = todas; solo se filtra cuando el valor es literalmente '0' o '1'.
         $estado = in_array($_GET['estado'] ?? '', ['0', '1'], true) ? (int)$_GET['estado'] : null;
+        // Si está marcado, el filtro de fecha se ignora por completo (se pasa null al
+        // modelo) sin importar qué haya en fecha_inicio/fecha_fin del formulario.
+        $ignorarFechas = !empty($_GET['ignorar_fechas']);
 
-        $historial = $cajaModel->getHistorial($fecha_inicio, $fecha_fin, null, $estado, $nombre !== '' ? $nombre : null);
+        $historial = $cajaModel->getHistorial(
+            $ignorarFechas ? null : $fecha_inicio,
+            $ignorarFechas ? null : $fecha_fin,
+            null,
+            $estado,
+            $nombre !== '' ? $nombre : null
+        );
 
         $data = [
             'title' => 'Historial de Cajas',
@@ -29,6 +38,7 @@ class CajaController extends Controller {
             'fecha_fin' => $fecha_fin,
             'nombre' => $nombre,
             'estado' => $estado,
+            'ignorar_fechas' => $ignorarFechas,
             'mostrar_filtro_nombre' => true,
             'ruta_filtro' => 'caja/index'
         ];
@@ -44,8 +54,14 @@ class CajaController extends Controller {
         $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-d', strtotime('-30 days'));
         $fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
         $estado = in_array($_GET['estado'] ?? '', ['0', '1'], true) ? (int)$_GET['estado'] : null;
+        $ignorarFechas = !empty($_GET['ignorar_fechas']);
 
-        $historial = $cajaModel->getHistorial($fecha_inicio, $fecha_fin, $_SESSION['user_id'], $estado);
+        $historial = $cajaModel->getHistorial(
+            $ignorarFechas ? null : $fecha_inicio,
+            $ignorarFechas ? null : $fecha_fin,
+            $_SESSION['user_id'],
+            $estado
+        );
 
         $data = [
             'title' => 'Mi Historial de Arqueos',
@@ -53,6 +69,7 @@ class CajaController extends Controller {
             'fecha_inicio' => $fecha_inicio,
             'fecha_fin' => $fecha_fin,
             'estado' => $estado,
+            'ignorar_fechas' => $ignorarFechas,
             'mostrar_filtro_nombre' => false,
             'ruta_filtro' => 'caja/historial_propio'
         ];
