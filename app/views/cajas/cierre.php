@@ -62,6 +62,7 @@
                 </div>
                 <div class="card-body">
                     <form action="<?php echo BASE_URL; ?>caja/cierre" method="POST">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
 
                         <div class="mb-4 text-center">
                             <label class="form-label font-weight-bold" style="color:var(--danger);">Ingresar Monto Físico Contado (S/)</label>
@@ -96,6 +97,7 @@
                 <div class="row">
                     <div class="col-md-5 border-end">
                         <form action="<?php echo BASE_URL; ?>caja/movimiento" method="POST">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
                             <h6 class="mb-3" style="color:var(--text-secondary);">Registrar Nuevo Movimiento</h6>
                             <div class="mb-2">
                                 <label class="form-label" style="font-size:12px;">Tipo de Movimiento</label>

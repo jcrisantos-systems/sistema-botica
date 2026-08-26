@@ -14,6 +14,7 @@
                 <i class="bi bi-cash-stack" style="font-size: 3rem; color:var(--accent-primary);"></i>
                 <h5 style="color: var(--text-primary); font-weight:700; margin-top: 12px;">Registrar Saldo Inicial</h5>
                 <form action="<?php echo BASE_URL; ?>caja/apertura" method="POST" class="mt-4">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
                     <div class="mb-3">
                         <label class="form-label text-start d-block">Monto Base (S/)</label>
                         <input type="number" step="0.01" name="monto_inicial" class="form-control-custom text-center" style="font-size: 1.5rem; font-weight: bold;" placeholder="0.00" required autofocus>
