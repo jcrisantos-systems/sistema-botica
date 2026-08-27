@@ -37,7 +37,7 @@
             <?php endif; ?>
         </a>
         <ul class="sidebar-nav">
-            <?php if($_SESSION['rol_id'] == 1): ?>
+            <?php if(in_array($_SESSION['rol_id'], [1, 2, 3, 4])): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>dashboard/index" class="nav-link">
                     <i class="bi bi-grid-1x2-fill"></i> Dashboard
