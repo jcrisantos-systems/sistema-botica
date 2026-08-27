@@ -103,19 +103,70 @@ class Caja {
         return $stmt->execute();
     }
     
-    public function getHistorial($fecha_inicio, $fecha_fin) {
-        $query = "SELECT c.*, u.nombres, u.apellidos 
-                  FROM " . $this->table_name . " c 
-                  JOIN usuarios u ON c.usuario_id = u.id 
-                  WHERE DATE(c.fecha_apertura) >= :inicio AND DATE(c.fecha_apertura) <= :fin 
-                  ORDER BY c.id DESC";
+    // $fecha_inicio/$fecha_fin opcionales: null en cualquiera de los dos = sin filtro de
+    // fecha (usado por el checkbox "Buscar en todo el historial" de cajas/index.php).
+    // $usuario_id opcional: si se pasa, restringe el historial a un solo usuario (usado
+    // para que un Cajero/Farmacéutico/Almacenero vea solo sus propios arqueos).
+    // $estado opcional: 1 (abiertas), 0 (cerradas) o null (todas).
+    // $nombre opcional: filtra por coincidencia parcial sobre nombres+apellidos del
+    // cajero (LIKE preparado, nunca concatenado directo). La colación utf8mb4_unicode_ci
+    // ya existente en usuarios.nombres/apellidos pliega mayúsculas/minúsculas y tildes
+    // (mismo criterio ya verificado y documentado para categorias.nombre en fase12).
+    public function getHistorial($fecha_inicio = null, $fecha_fin = null, $usuario_id = null, $estado = null, $nombre = null) {
+        $query = "SELECT c.*, u.nombres, u.apellidos
+                  FROM " . $this->table_name . " c
+                  JOIN usuarios u ON c.usuario_id = u.id";
+
+        $condiciones = [];
+        if ($fecha_inicio !== null && $fecha_fin !== null) {
+            $condiciones[] = "DATE(c.fecha_apertura) >= :inicio AND DATE(c.fecha_apertura) <= :fin";
+        }
+        if ($usuario_id !== null) {
+            $condiciones[] = "c.usuario_id = :usuario_id";
+        }
+        if ($estado !== null) {
+            $condiciones[] = "c.estado = :estado";
+        }
+        if ($nombre !== null && $nombre !== '') {
+            $condiciones[] = "CONCAT(u.nombres, ' ', u.apellidos) LIKE :nombre";
+        }
+        if (!empty($condiciones)) {
+            $query .= " WHERE " . implode(" AND ", $condiciones);
+        }
+        $query .= " ORDER BY c.id DESC";
+
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':inicio', $fecha_inicio);
-        $stmt->bindParam(':fin', $fecha_fin);
+        if ($fecha_inicio !== null && $fecha_fin !== null) {
+            $stmt->bindParam(':inicio', $fecha_inicio);
+            $stmt->bindParam(':fin', $fecha_fin);
+        }
+        if ($usuario_id !== null) {
+            $stmt->bindParam(':usuario_id', $usuario_id);
+        }
+        if ($estado !== null) {
+            $stmt->bindParam(':estado', $estado, PDO::PARAM_INT);
+        }
+        if ($nombre !== null && $nombre !== '') {
+            $comodin = '%' . $nombre . '%';
+            $stmt->bindParam(':nombre', $comodin);
+        }
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
+    // Nombres completos distintos de usuarios que ya abrieron caja alguna vez (no todos
+    // los usuarios del sistema). Usado solo como sugerencia de autocompletado (<datalist>)
+    // en el filtro "Buscar por nombre" del Historial de Cajas de Administrador.
+    public function getNombresConCaja() {
+        $query = "SELECT DISTINCT u.nombres, u.apellidos
+                  FROM " . $this->table_name . " c
+                  JOIN usuarios u ON c.usuario_id = u.id
+                  ORDER BY u.nombres, u.apellidos";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getById($caja_id) {
         $query = "SELECT c.*, u.nombres, u.apellidos 
                   FROM " . $this->table_name . " c 

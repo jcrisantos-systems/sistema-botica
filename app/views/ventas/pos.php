@@ -535,7 +535,7 @@ function mostrarAlerta(tipo, mensaje, idVentaParaTicket) {
         box.innerHTML = `
             <div class="alert alert-success mt-2 mb-2 p-2 px-3" style="background-color: var(--success-bg); color: var(--accent-primary); border: 1px solid var(--accent-primary); font-weight:600; display:flex; justify-content:space-between;">
                 <span><i class="bi bi-check-circle-fill"></i> ${mensaje}</span>
-                ${idVentaParaTicket ? `<button class="btn btn-sm btn-outline-success border-0" onclick="window.open('<?php echo BASE_URL; ?>venta/ticket/${idVentaParaTicket}', 'Ticket', 'width=400,height=600')"><i class="bi bi-printer"></i> Imprimir Ticket</button>` : ''}
+                ${idVentaParaTicket ? `<button class="btn btn-sm btn-outline-success border-0" onclick="window.open('<?php echo BASE_URL; ?>venta/ticket/${idVentaParaTicket}', '_blank')"><i class="bi bi-printer"></i> Imprimir Ticket</button>` : ''}
             </div>`;
     } else {
         box.innerHTML = `

@@ -20,6 +20,25 @@ class Cliente {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // Verifica si ya existe otro cliente con ese tipo+número de documento (columna sin
+    // UNIQUE en BD todavía; este es el único control de duplicados hasta que se autorice
+    // la Fase F). $excludeId permite ignorar el propio registro al editar.
+    public function existeCliente($tipoDocumento, $numDocumento, $excludeId = null) {
+        $query = "SELECT 1 FROM clientes WHERE tipo_documento = :tipo AND num_documento = :num";
+        if ($excludeId !== null) {
+            $query .= " AND id != :id";
+        }
+        $query .= " LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':tipo', $tipoDocumento);
+        $stmt->bindParam(':num', $numDocumento);
+        if ($excludeId !== null) {
+            $stmt->bindParam(':id', $excludeId);
+        }
+        $stmt->execute();
+        return $stmt->fetchColumn() !== false;
+    }
+
     public function create($data) {
         $stmt = $this->conn->prepare("INSERT INTO clientes (tipo_documento, num_documento, nombres, telefono, direccion) VALUES (:tipo, :num, :nom, :tel, :dir)");
         $stmt->bindParam(':tipo', $data['tipo_documento']);

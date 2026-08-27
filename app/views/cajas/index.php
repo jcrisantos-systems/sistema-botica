@@ -6,14 +6,42 @@
 
     <!-- Filtros -->
     <div class="card-metric mb-4 p-3">
-        <form method="GET" action="<?php echo BASE_URL; ?>caja/index" class="row align-items-end g-3">
-            <div class="col-md-3">
+        <form method="GET" action="<?php echo BASE_URL . ($data['ruta_filtro'] ?? 'caja/index'); ?>" class="row align-items-end g-3">
+            <div class="col-md-2">
                 <label class="form-label" style="font-size:12px;">Fecha Inicio</label>
-                <input type="date" name="fecha_inicio" class="form-control-custom" value="<?php echo $data['fecha_inicio']; ?>">
+                <input type="date" name="fecha_inicio" class="form-control-custom" value="<?php echo htmlspecialchars($data['fecha_inicio'], ENT_QUOTES, 'UTF-8'); ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label" style="font-size:12px;">Fecha Fin</label>
-                <input type="date" name="fecha_fin" class="form-control-custom" value="<?php echo $data['fecha_fin']; ?>">
+                <input type="date" name="fecha_fin" class="form-control-custom" value="<?php echo htmlspecialchars($data['fecha_fin'], ENT_QUOTES, 'UTF-8'); ?>">
+            </div>
+            <?php if (!empty($data['mostrar_filtro_nombre'])): ?>
+            <div class="col-md-3">
+                <label class="form-label" style="font-size:12px;">Buscar por nombre</label>
+                <input type="text" name="nombre" class="form-control-custom" placeholder="Nombre o apellido del trabajador" value="<?php echo htmlspecialchars($data['nombre'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" list="sugerencias_nombre_trabajador">
+                <!-- Solo ayuda visual de autocompletado: el input sigue aceptando cualquier
+                     texto libre, la búsqueda LIKE del backend no cambia en nada. -->
+                <datalist id="sugerencias_nombre_trabajador">
+                    <?php foreach ($data['sugerencias_nombre'] ?? [] as $s): ?>
+                        <option value="<?php echo htmlspecialchars($s['nombres'] . ' ' . $s['apellidos'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <?php endforeach; ?>
+                </datalist>
+            </div>
+            <?php endif; ?>
+            <div class="col-md-2">
+                <label class="form-label" style="font-size:12px;">Estado</label>
+                <?php $estadoActual = $data['estado'] ?? null; ?>
+                <select name="estado" class="form-control-custom">
+                    <option value="" <?php echo $estadoActual === null ? 'selected' : ''; ?>>Todas</option>
+                    <option value="1" <?php echo $estadoActual === 1 ? 'selected' : ''; ?>>Abierta</option>
+                    <option value="0" <?php echo $estadoActual === 0 ? 'selected' : ''; ?>>Cerrada</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-center">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="ignorar_fechas" name="ignorar_fechas" value="1" <?php echo !empty($data['ignorar_fechas']) ? 'checked' : ''; ?>>
+                    <label class="form-check-label" for="ignorar_fechas" style="font-size:12px;">Buscar en todo el historial (ignorar fechas)</label>
+                </div>
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn-primary-custom" style="width:100%;">
@@ -41,8 +69,18 @@
                     </tr>
                 </thead>
                     <tbody>
-                        <?php foreach ($data['historial'] as $c): ?>
-                        <tr>
+                        <?php foreach ($data['historial'] as $c):
+                            // Puramente visual/informativo: no se modifica ningún dato. Se calcula
+                            // en PHP (no en SQL) para mantener el cálculo junto al resto del
+                            // formateo de fila que ya vive en esta vista.
+                            $horasAbierta = null;
+                            $abiertaHaceMucho = false;
+                            if ($c['estado'] == 1) {
+                                $horasAbierta = (time() - strtotime($c['fecha_apertura'])) / 3600;
+                                $abiertaHaceMucho = $horasAbierta > 24;
+                            }
+                        ?>
+                        <tr<?php echo $abiertaHaceMucho ? ' style="background-color: rgba(220,53,69,0.08); border-left: 3px solid var(--danger);"' : ''; ?>>
                             <td><strong><?php echo $c['id']; ?></strong></td>
                             <td><?php echo htmlspecialchars($c['nombres'] . ' ' . $c['apellidos']); ?></td>
                             <td><?php echo date('d/m H:i', strtotime($c['fecha_apertura'])); ?></td>
@@ -66,6 +104,9 @@
                             <td>
                                 <?php if($c['estado'] == 1): ?>
                                     <span class="badge bg-success"><i class="bi bi-circle-fill" style="font-size: 8px;"></i> ABIERTA</span>
+                                    <?php if ($abiertaHaceMucho): ?>
+                                        <br><small class="text-danger fw-bold"><i class="bi bi-exclamation-triangle-fill"></i> Abierta hace más de 24h</small>
+                                    <?php endif; ?>
                                 <?php else: ?>
                                     <span class="badge bg-secondary">CERRADA</span>
                                 <?php endif; ?>
@@ -82,7 +123,12 @@
                         
                         <?php if(empty($data['historial'])): ?>
                             <tr>
-                                <td colspan="10" class="text-center text-muted py-4">No hay registros de caja para las fechas seleccionadas.</td>
+                                <td colspan="10" class="text-center text-muted py-4">
+                                    No hay registros de caja para las fechas seleccionadas.
+                                    <?php if (empty($data['ignorar_fechas']) && !empty($data['nombre'])): ?>
+                                        <br><small class="d-block mt-2">¿No encontraste lo que buscabas? Prueba marcando "Buscar en todo el historial" para ignorar el rango de fechas.</small>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

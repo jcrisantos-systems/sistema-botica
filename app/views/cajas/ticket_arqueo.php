@@ -2,15 +2,19 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Ticket de Arqueo #<?php echo $caja['id']; ?></title>
+    <title><?php echo htmlspecialchars($tituloTicket, ENT_QUOTES, 'UTF-8'); ?></title>
     <style>
-        @page { margin: 0; }
-        body { margin: 0; padding: 10px; font-family: 'Courier New', Courier, monospace; font-size: 12px; width: 300px; }
+        /* Ancho de ticket: pensado para una impresora térmica de 80mm (aún no se tiene
+           una física). Para cambiar a 58mm más adelante, ajustar --ticket-width Y el
+           "size" de @page (los navegadores no soportan variables CSS dentro de @page). */
+        :root { --ticket-width: 80mm; }
+        @page { size: 80mm auto; margin: 0; }
+        body { margin: 0; padding: 10px; font-family: 'Courier New', Courier, monospace; font-size: 12px; width: var(--ticket-width); }
         .center { text-align: center; }
         .bold { font-weight: bold; }
         .line { border-bottom: 1px dashed #000; margin: 10px 0; }
         .row { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        @media print { body { width: 100%; margin: 0; padding: 0; padding-right:15px; } }
+        @media print { body { width: var(--ticket-width); margin: 0; padding: 0; } }
     </style>
 </head>
 <body onload="window.print()">

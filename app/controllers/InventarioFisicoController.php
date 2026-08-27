@@ -2,7 +2,7 @@
 class InventarioFisicoController extends Controller {
 
     public function __construct() {
-        $this->requireAdmin();
+        $this->requireRole([1, 4]);
     }
 
     public function index() {

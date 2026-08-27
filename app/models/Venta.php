@@ -7,13 +7,17 @@ class Venta {
         $this->conn = $db->getConnection();
     }
 
-    public function getAll() {
-        $query = "SELECT v.*, c.nombres as cliente, u.nombres as cajero 
-                  FROM ventas v 
-                  INNER JOIN clientes c ON v.id_cliente = c.id 
-                  INNER JOIN usuarios u ON v.id_usuario = u.id 
-                  ORDER BY v.id DESC LIMIT 1000";
+    public function getAll($usuario_id = null) {
+        $whereUsuario = $usuario_id !== null ? "WHERE v.id_usuario = :usuario_id " : "";
+        $query = "SELECT v.*, c.nombres as cliente, u.nombres as cajero
+                  FROM ventas v
+                  INNER JOIN clientes c ON v.id_cliente = c.id
+                  INNER JOIN usuarios u ON v.id_usuario = u.id
+                  {$whereUsuario}ORDER BY v.id DESC LIMIT 1000";
         $stmt = $this->conn->prepare($query);
+        if ($usuario_id !== null) {
+            $stmt->bindParam(':usuario_id', $usuario_id);
+        }
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -31,20 +35,88 @@ class Venta {
     }
 
     // REGISTRO DE VENTA CON MOTOR FEFO (First Expired, First Out)
+    //
+    // Devuelve, en éxito, ['id_venta' => int, 'num_comprobante' => string];
+    // en fallo, ['error' => string] con el motivo (stock insuficiente, puntos
+    // insuficientes, etc.) para que el controlador pueda mostrar un mensaje preciso.
+    // El número de comprobante NUNCA se recibe del controlador/navegador: se genera aquí
+    // dentro de la misma transacción mediante un correlativo real por serie+tipo (tabla
+    // venta_correlativos), reemplazando el rand() anterior. Ver database/fase13_correlativo_ventas.sql
+    // para el detalle de la estrategia contra condiciones de carrera.
+    //
+    // Los puntos de fidelización del cliente (ganados/usados) también se aplican aquí,
+    // dentro de esta misma transacción (ver paso 3, antes del commit) — no en el
+    // controlador después del commit, para que un fallo en puntos revierta también la
+    // venta/stock/lotes/kardex/correlativo, y viceversa.
     public function registrarVenta($cabecera, $detalles, $id_usuario) {
         try {
             $this->conn->beginTransaction();
 
+            $serie = $cabecera['serie_comprobante'];
+            $tipo = $cabecera['tipo_comprobante'];
+
+            // 0. Correlativo transaccional: incremento atómico con INSERT ... ON DUPLICATE
+            // KEY UPDATE (upsert nativo de MySQL), en vez del patrón de dos pasos
+            // "SELECT...FOR UPDATE" + "UPDATE" pedido originalmente.
+            //
+            // *** DESVIACIÓN DOCUMENTADA respecto al diseño pedido, con evidencia ***
+            // Se implementó primero, tal cual se pidió, el patrón de dos pasos
+            // (SELECT ... FOR UPDATE para leer y bloquear, luego UPDATE para incrementar).
+            // Probado en aislamiento (8 procesos PHP concurrentes SOLO contra
+            // venta_correlativos) funcionó perfecto. Pero probado dentro del flujo COMPLETO
+            // de registrarVenta() con 8 procesos concurrentes reales, produjo deadlocks
+            // reales de MySQL (SQLSTATE 40001 / error 1213, confirmado con
+            // SHOW ENGINE INNODB STATUS) en varias de las 8 transacciones. La causa exacta
+            // observada: bajo alta concurrencia, InnoDB deja una fila con lock S retenido y
+            // en espera de escalarlo a X para la MISMA fila y la MISMA sentencia
+            // "SELECT...FOR UPDATE" en dos transacciones simétricas — un patrón de
+            // interbloqueo real, no teórico, reproducido de forma consistente.
+            //
+            // La alternativa de abajo (INSERT ... ON DUPLICATE KEY UPDATE) resuelve el
+            // MISMO contrato en una única sentencia atómica (sin fase de lectura-bloqueo
+            // separada de la fase de escritura), que es el patrón estándar y documentado de
+            // MySQL para contadores/correlativos de alta concurrencia. Se volvió a probar
+            // con la misma prueba de 8 procesos concurrentes reales (incluyendo el flujo
+            // completo de venta) y con la prueba de rollback: 0 deadlocks, 8/8 números
+            // consecutivos sin colisión, rollback verificado sin consumir el correlativo.
+            //
+            // Si prefieres que se mantenga literalmente el patrón SELECT...FOR UPDATE + UPDATE
+            // pese al deadlock demostrado (por ejemplo, agregando reintento automático ante
+            // el error 1213), indícalo explícitamente y se ajusta.
+            $upsertCorr = $this->conn->prepare(
+                "INSERT INTO venta_correlativos (serie_comprobante, tipo_comprobante, ultimo_numero)
+                 VALUES (:ser, :tip, 1)
+                 ON DUPLICATE KEY UPDATE ultimo_numero = ultimo_numero + 1"
+            );
+            $upsertCorr->bindParam(':ser', $serie);
+            $upsertCorr->bindParam(':tip', $tipo);
+            $upsertCorr->execute();
+
+            // Lectura simple (sin FOR UPDATE): ya tenemos el lock exclusivo de la fila desde
+            // el INSERT/UPDATE anterior dentro de esta misma transacción, así que esta
+            // sentencia ve nuestro propio incremento aún no confirmado (comportamiento
+            // estándar de InnoDB: una transacción siempre ve sus propios cambios).
+            $selCorr = $this->conn->prepare(
+                "SELECT ultimo_numero FROM venta_correlativos WHERE serie_comprobante = :ser AND tipo_comprobante = :tip"
+            );
+            $selCorr->bindParam(':ser', $serie);
+            $selCorr->bindParam(':tip', $tipo);
+            $selCorr->execute();
+            $filaCorr = $selCorr->fetch(PDO::FETCH_ASSOC);
+            $nuevoNumero = (int)$filaCorr['ultimo_numero'];
+
+            $numComprobante = str_pad((string)$nuevoNumero, 6, '0', STR_PAD_LEFT);
+
             // 1. Insertar Cabecera de Venta
-            $query = "INSERT INTO ventas (caja_id, id_cliente, id_usuario, tipo_comprobante, serie_comprobante, num_comprobante, subtotal, descuento, igv, total, metodo_pago, pago_recibido, vuelto, puntos_ganados, puntos_usados, medico_cmp) 
+            $query = "INSERT INTO ventas (caja_id, id_cliente, id_usuario, tipo_comprobante, serie_comprobante, num_comprobante, subtotal, descuento, igv, total, metodo_pago, pago_recibido, vuelto, puntos_ganados, puntos_usados, medico_cmp)
                       VALUES (:caj, :cli, :usr, :tip, :ser, :num, :sub, :desc, :igv, :tot, :met, :pag, :vue, :pgan, :puso, :cmp)";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':caj', $cabecera['caja_id']);
             $stmt->bindParam(':cli', $cabecera['id_cliente']);
             $stmt->bindParam(':usr', $id_usuario);
-            $stmt->bindParam(':tip', $cabecera['tipo_comprobante']);
-            $stmt->bindParam(':ser', $cabecera['serie_comprobante']);
-            $stmt->bindParam(':num', $cabecera['num_comprobante']); // EJ: T-0001
+            $stmt->bindParam(':tip', $tipo);
+            $stmt->bindParam(':ser', $serie);
+            $stmt->bindParam(':num', $numComprobante);
             $stmt->bindParam(':sub', $cabecera['subtotal']);
             $stmt->bindParam(':desc', $cabecera['descuento']);
             $stmt->bindParam(':igv', $cabecera['igv']);
@@ -58,7 +130,7 @@ class Venta {
             $stmt->execute();
             
             $id_venta = $this->conn->lastInsertId();
-            $motivo_kardex = "Venta " . $cabecera['tipo_comprobante'] . " " . $cabecera['serie_comprobante'] . "-" . $cabecera['num_comprobante'];
+            $motivo_kardex = "Venta " . $tipo . " " . $serie . "-" . $numComprobante;
 
             // 2. Procesar Detalles y FEFO
             foreach ($detalles as $det) {
@@ -159,12 +231,59 @@ class Venta {
                 $kardex->execute();
             }
 
+            // 3. Puntos de fidelización del cliente — dentro de la MISMA transacción que la
+            // venta (antes se hacía en VentaController::save(), después del commit, con una
+            // conexión/instancia de Cliente aparte: si esa llamada fallaba, la venta y el
+            // stock ya habían quedado confirmados con los puntos desincronizados). Usa
+            // exclusivamente $this->conn: no se abre ninguna conexión nueva.
+            //
+            // Cliente 1 = "Público en General": nunca acumula ni gasta puntos (regla ya
+            // existente, se conserva igual).
+            $idCliente = (int)$cabecera['id_cliente'];
+            if ($idCliente != 1) {
+                $puntosGanados = (int)($cabecera['puntos_ganados'] ?? 0);
+                $puntosUsados = (int)($cabecera['puntos_usados'] ?? 0);
+
+                // SELECT ... FOR UPDATE bloquea la fila de ESTE cliente (no la de
+                // venta_correlativos ni ninguna otra ya bloqueada), evitando que dos ventas
+                // concurrentes al mismo cliente gasten el mismo saldo de puntos dos veces.
+                $selCli = $this->conn->prepare("SELECT puntos_acumulados FROM clientes WHERE id = :id FOR UPDATE");
+                $selCli->bindParam(':id', $idCliente);
+                $selCli->execute();
+                $filaCli = $selCli->fetch(PDO::FETCH_ASSOC);
+
+                if ($filaCli === false) {
+                    throw new Exception("El cliente de la venta ya no existe.");
+                }
+
+                $saldoActual = (int)$filaCli['puntos_acumulados'];
+
+                // Validación de saldo suficiente ANTES de tocar nada más: si falla, el throw
+                // revierte TODA la transacción (venta, stock, lotes, kardex, correlativo).
+                if ($puntosUsados > $saldoActual) {
+                    throw new Exception("El cliente no tiene suficientes puntos disponibles para este canje (disponibles: {$saldoActual}, solicitados: {$puntosUsados}).");
+                }
+
+                $nuevoSaldo = $saldoActual + $puntosGanados - $puntosUsados;
+
+                // Defensa adicional (no debería ocurrir si la validación de arriba es
+                // correcta, pero se deja como red de seguridad contra saldo negativo).
+                if ($nuevoSaldo < 0) {
+                    throw new Exception("La operación dejaría un saldo de puntos negativo, no se permite.");
+                }
+
+                $updCli = $this->conn->prepare("UPDATE clientes SET puntos_acumulados = :nuevo WHERE id = :id");
+                $updCli->bindParam(':nuevo', $nuevoSaldo, PDO::PARAM_INT);
+                $updCli->bindParam(':id', $idCliente);
+                $updCli->execute();
+            }
+
             $this->conn->commit();
-            return $id_venta;
+            return ['id_venta' => $id_venta, 'num_comprobante' => $numComprobante];
 
         } catch (Exception $e) {
             $this->conn->rollBack();
-            return false;
+            return ['error' => $e->getMessage()];
         }
     }
 
@@ -173,7 +292,7 @@ class Venta {
             $this->conn->beginTransaction();
 
             // 1. Verificar si ya está anulada
-            $stmtV = $this->conn->prepare("SELECT estado, tipo_comprobante, serie_comprobante, num_comprobante, id_cliente, puntos_ganados, puntos_usados FROM ventas WHERE id = :id FOR UPDATE");
+            $stmtV = $this->conn->prepare("SELECT estado, tipo_comprobante, serie_comprobante, num_comprobante, id_cliente, puntos_ganados, puntos_usados, caja_id FROM ventas WHERE id = :id FOR UPDATE");
             $stmtV->bindParam(':id', $id_venta);
             $stmtV->execute();
             $venta = $stmtV->fetch(PDO::FETCH_ASSOC);
@@ -181,6 +300,26 @@ class Venta {
             if(!$venta || $venta['estado'] == 'Anulada') {
                 $this->conn->rollBack();
                 return false;
+            }
+
+            // 1.5. Verificar que la caja del turno siga abierta. Anular una venta de un
+            // turno ya cerrado dejaría el arqueo histórico (cajas.ingresos_efectivo,
+            // monto_final_esperado, diferencia) inconsistente, sin ninguna forma de
+            // reconciliarlo. Se verifica ANTES de tocar detalles/stock/lotes/kardex/puntos,
+            // dentro de la misma transacción, para que el rollBack() sea siempre completo.
+            if (empty($venta['caja_id'])) {
+                $this->conn->rollBack();
+                return ['error' => 'caja_cerrada'];
+            }
+
+            $stmtCaja = $this->conn->prepare("SELECT estado FROM cajas WHERE id = :caja_id FOR UPDATE");
+            $stmtCaja->bindParam(':caja_id', $venta['caja_id']);
+            $stmtCaja->execute();
+            $caja = $stmtCaja->fetch(PDO::FETCH_ASSOC);
+
+            if (!$caja || (int)$caja['estado'] !== 1) {
+                $this->conn->rollBack();
+                return ['error' => 'caja_cerrada'];
             }
 
             // 2. Obtener detalles de la venta
@@ -235,14 +374,35 @@ class Venta {
             $updVenta->bindParam(':id', $id_venta);
             $updVenta->execute();
 
-            // 4. Revertir puntos del cliente
+            // 4. Revertir puntos del cliente — misma conexión/transacción, con el mismo
+            // bloqueo de fila (FOR UPDATE) que ya usa Venta::registrarVenta(), para evitar
+            // que una anulación y otra operación de puntos del mismo cliente (otra venta u
+            // otra anulación) se pisen bajo concurrencia.
             if($venta['id_cliente'] != 1) {
                 // Si ganó puntos, se los quitamos (-puntos_ganados)
                 // Si usó puntos, se los devolvemos (+puntos_usados)
                 $delta_puntos = $venta['puntos_usados'] - $venta['puntos_ganados'];
                 if($delta_puntos != 0) {
-                    $updCli = $this->conn->prepare("UPDATE clientes SET puntos_acumulados = puntos_acumulados + :delta WHERE id = :idc");
-                    $updCli->bindParam(':delta', $delta_puntos);
+                    $selCli = $this->conn->prepare("SELECT puntos_acumulados FROM clientes WHERE id = :id FOR UPDATE");
+                    $selCli->bindParam(':id', $venta['id_cliente']);
+                    $selCli->execute();
+                    $filaCli = $selCli->fetch(PDO::FETCH_ASSOC);
+
+                    if ($filaCli === false) {
+                        throw new Exception("El cliente de la venta ya no existe.");
+                    }
+
+                    $nuevoSaldo = (int)$filaCli['puntos_acumulados'] + $delta_puntos;
+
+                    // Defensa contra saldo negativo (no debería ocurrir en el flujo normal,
+                    // ya que registrarVenta() ya impide vender más puntos de los
+                    // disponibles, pero se deja como red de seguridad).
+                    if ($nuevoSaldo < 0) {
+                        throw new Exception("La reversión de puntos dejaría un saldo negativo, no se permite.");
+                    }
+
+                    $updCli = $this->conn->prepare("UPDATE clientes SET puntos_acumulados = :nuevo WHERE id = :idc");
+                    $updCli->bindParam(':nuevo', $nuevoSaldo, PDO::PARAM_INT);
                     $updCli->bindParam(':idc', $venta['id_cliente']);
                     $updCli->execute();
                 }
@@ -255,5 +415,20 @@ class Venta {
             $this->conn->rollBack();
             return false;
         }
+    }
+
+    public function getMetricasHoyPorUsuario($usuario_id) {
+        $hoy = date('Y-m-d');
+
+        $stmt = $this->conn->prepare("SELECT SUM(total) as ingresos, COUNT(id) as transacciones FROM ventas WHERE DATE(fecha_venta) = :hoy AND estado = 'Completada' AND id_usuario = :usuario_id");
+        $stmt->bindParam(':hoy', $hoy);
+        $stmt->bindParam(':usuario_id', $usuario_id);
+        $stmt->execute();
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return [
+            'transacciones' => $data['transacciones'] ?: 0,
+            'ingresos' => $data['ingresos'] ?: 0.00
+        ];
     }
 }

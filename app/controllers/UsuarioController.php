@@ -40,7 +40,21 @@ class UsuarioController extends Controller {
                 'rol_id' => (int)$_POST['rol_id'],
                 'estado' => 1
             ];
-            
+
+            // Validación backend de correo duplicado, normalizando mayúsculas/minúsculas y
+            // espacios. No existe todavía un UNIQUE de BD para email (pendiente de Fase F,
+            // tras decidir qué hacer con las 3 cuentas duplicadas ya detectadas) — este
+            // chequeo solo previene NUEVOS duplicados, sin tocar cuentas existentes. Se
+            // omite si el correo queda vacío (el campo no es obligatorio a nivel de BD).
+            if ($data['email'] !== '') {
+                $excludeIdEmail = empty($_POST['id']) ? null : $_POST['id'];
+                if ($userModel->existeEmail($data['email'], $excludeIdEmail)) {
+                    $this->flash('error', "Ya existe otro usuario registrado con el correo '{$data['email']}'.");
+                    header('Location: ' . BASE_URL . 'usuario/index');
+                    exit;
+                }
+            }
+
             if (empty($_POST['id'])) {
                 // Nuevo usuario
                 if (strlen($_POST['password'] ?? '') < 8) {
@@ -149,6 +163,14 @@ class UsuarioController extends Controller {
 
         if ($nombres === '' || $apellidos === '') {
             $_SESSION['error'] = "Nombres y apellidos son obligatorios.";
+            header('Location: ' . BASE_URL . 'usuario/perfil');
+            exit;
+        }
+
+        // Mismo control de correo duplicado que en la gestión de personal (Fase C), para
+        // que un usuario no pueda auto-asignarse por perfil el correo de otra cuenta.
+        if ($email !== '' && $userModel->existeEmail($email, $id)) {
+            $_SESSION['error'] = "Ya existe otro usuario registrado con el correo '{$email}'.";
             header('Location: ' . BASE_URL . 'usuario/perfil');
             exit;
         }

@@ -2,10 +2,10 @@
 class CajaController extends Controller {
 
     public function __construct() {
-        if (!isset($_SESSION['user_id'])) {
-            header('Location: ' . BASE_URL . 'auth/login');
-            exit;
-        }
+        // Administrador (1), Farmacéutico (2) y Cajero (3) operan Caja; Almacenero (4)
+        // queda excluido de todas las acciones (apertura, cierre, movimientos, arqueos
+        // propios o ajenos). index() además exige requireAdmin() como capa redundante.
+        $this->requireRole([1, 2, 3]);
     }
 
     public function index() {
@@ -14,18 +14,67 @@ class CajaController extends Controller {
 
         $cajaModel = $this->model('Caja');
 
-        $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-d');
+        $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-d', strtotime('-30 days'));
         $fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
-        
-        $historial = $cajaModel->getHistorial($fecha_inicio, $fecha_fin);
-        
+        $nombre = trim($_GET['nombre'] ?? '');
+        // '' (sin seleccionar) = todas; solo se filtra cuando el valor es literalmente '0' o '1'.
+        $estado = in_array($_GET['estado'] ?? '', ['0', '1'], true) ? (int)$_GET['estado'] : null;
+        // Si está marcado, el filtro de fecha se ignora por completo (se pasa null al
+        // modelo) sin importar qué haya en fecha_inicio/fecha_fin del formulario.
+        $ignorarFechas = !empty($_GET['ignorar_fechas']);
+
+        $historial = $cajaModel->getHistorial(
+            $ignorarFechas ? null : $fecha_inicio,
+            $ignorarFechas ? null : $fecha_fin,
+            null,
+            $estado,
+            $nombre !== '' ? $nombre : null
+        );
+
         $data = [
             'title' => 'Historial de Cajas',
             'historial' => $historial,
             'fecha_inicio' => $fecha_inicio,
-            'fecha_fin' => $fecha_fin
+            'fecha_fin' => $fecha_fin,
+            'nombre' => $nombre,
+            'estado' => $estado,
+            'ignorar_fechas' => $ignorarFechas,
+            'mostrar_filtro_nombre' => true,
+            'sugerencias_nombre' => $cajaModel->getNombresConCaja(),
+            'ruta_filtro' => 'caja/index'
         ];
-        
+
+        $this->view('cajas/index', $data);
+    }
+
+    // Historial propio: cualquier rol ve solo los arqueos de su propio usuario_id
+    // (a diferencia de index(), que es el listado completo solo para Administrador).
+    public function historial_propio() {
+        $cajaModel = $this->model('Caja');
+
+        $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-d', strtotime('-30 days'));
+        $fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
+        $estado = in_array($_GET['estado'] ?? '', ['0', '1'], true) ? (int)$_GET['estado'] : null;
+        $ignorarFechas = !empty($_GET['ignorar_fechas']);
+
+        $historial = $cajaModel->getHistorial(
+            $ignorarFechas ? null : $fecha_inicio,
+            $ignorarFechas ? null : $fecha_fin,
+            $_SESSION['user_id'],
+            $estado
+        );
+
+        $data = [
+            'title' => 'Mi Historial de Arqueos',
+            'historial' => $historial,
+            'fecha_inicio' => $fecha_inicio,
+            'fecha_fin' => $fecha_fin,
+            'estado' => $estado,
+            'ignorar_fechas' => $ignorarFechas,
+            'mostrar_filtro_nombre' => false,
+            'ruta_filtro' => 'caja/historial_propio'
+        ];
+
         $this->view('cajas/index', $data);
     }
 
@@ -73,8 +122,12 @@ class CajaController extends Controller {
             $observacion = trim($_POST['observacion'] ?? '');
             
             if ($cajaModel->cerrarCaja($cajaAbierta['id'], $monto_final_real, $observacion)) {
-                $_SESSION['mensaje'] = "Caja cerrada correctamente. Puede imprimir el arqueo.";
-                header('Location: ' . BASE_URL . 'caja/ticket_arqueo/' . $cajaAbierta['id']);
+                $_SESSION['mensaje'] = "Caja cerrada correctamente.";
+                // No se redirige directamente al ticket (eso "atrapaba" al usuario en una
+                // pestaña sin forma de volver). En su lugar, caja/apertura muestra el mensaje
+                // de éxito junto con un botón para ver el ticket en una pestaña nueva.
+                $_SESSION['ultimo_cierre_id'] = $cajaAbierta['id'];
+                header('Location: ' . BASE_URL . 'caja/apertura');
                 exit;
             } else {
                 $_SESSION['error'] = "Ocurrió un error al cerrar la caja.";
@@ -135,6 +188,45 @@ class CajaController extends Controller {
             exit;
         }
 
-        require_once '../app/views/cajas/ticket_arqueo.php';
+        $usuarioNormalizado = $this->normalizarNombreArchivo(($caja['nombres'] ?? '') . ' ' . ($caja['apellidos'] ?? ''));
+        // Usamos la fecha de cierre (no "ahora") para que el nombre de archivo sea estable:
+        // volver a ver el mismo ticket sobrescribe la misma copia en vez de duplicarla.
+        $fechaReferencia = !empty($caja['fecha_cierre']) ? strtotime($caja['fecha_cierre']) : time();
+        $tituloTicket = 'Arqueo_' . $usuarioNormalizado . '_' . date('Ymd_His', $fechaReferencia);
+
+        ob_start();
+        require '../app/views/cajas/ticket_arqueo.php';
+        $html = ob_get_clean();
+
+        $this->guardarCopiaArqueo($caja['id'], $usuarioNormalizado, $fechaReferencia, $html);
+
+        echo $html;
+    }
+
+    // Guarda una copia server-side del ticket de arqueo en storage/arqueos/ (fuera de
+    // public/, protegido además por su propio .htaccess). Es un respaldo "best effort":
+    // si falla, no debe impedir que el usuario vea/imprima su ticket.
+    private function guardarCopiaArqueo($cajaId, $usuarioNormalizado, $fechaReferencia, $html) {
+        $dir = '../storage/arqueos';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $nombreArchivo = sprintf('arqueo_%d_%s_%s.html', $cajaId, $usuarioNormalizado, date('Ymd_His', $fechaReferencia));
+
+        if (@file_put_contents($dir . '/' . $nombreArchivo, $html) === false) {
+            error_log('No se pudo guardar copia del arqueo: ' . $nombreArchivo);
+        }
+    }
+
+    // Convierte nombre/apellido (u otro texto libre) en un fragmento seguro para nombre
+    // de archivo: sin tildes/ñ, sin espacios, solo minúsculas/números/guion bajo.
+    private function normalizarNombreArchivo($texto) {
+        $texto = trim($texto);
+        $transliterado = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $texto);
+        $texto = $transliterado !== false ? $transliterado : $texto;
+        $texto = strtolower($texto);
+        $texto = preg_replace('/[^a-z0-9]+/', '_', $texto);
+        return trim($texto, '_');
     }
 }

@@ -1,5 +1,50 @@
+# NOTA PARA PRODUCCION: la protección de abajo depende de que este .htaccess se
+# procese (AllowOverride All + mod_rewrite activos) con el DocumentRoot apuntando a la
+# raíz del proyecto. La forma correcta y recomendada en un servidor de producción es
+# configurar el DocumentRoot directamente sobre la carpeta "public/" (como ya indica
+# el README) en vez de depender de este rewrite; así app/, database/, storage/ y demás
+# quedan fuera del docroot por diseño, sin depender de ninguna regla.
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # Bloquea acceso HTTP directo a rutas y archivos sensibles ANTES de reescribir hacia
+    # public/. Solo intercepta URLs que empiecen exactamente con estos prefijos o
+    # terminen en .sql: no afecta las rutas de la aplicación (producto/index, venta/pos,
+    # importacion/*, etc.) ni los assets servidos desde public/ (css/js/img).
+    RewriteRule ^\. - [F,L]
+    RewriteRule ^app/ - [F,L]
+    RewriteRule ^database/ - [F,L]
+    RewriteRule ^storage/ - [F,L]
+    RewriteRule ^setup/ - [F,L]
+    RewriteRule \.sql$ - [F,L]
+    RewriteRule ^(basededatos\.md|MANUAL_DE_USUARIO\.md|MANUAL_RESPALDO_Y_RESETEO\.md|README\.md|REPORTE_SEGURIDAD\.md|plantrabajo\.md|LICENSE)$ - [F,L]
+
     RewriteRule ^$ public/ [L]
     RewriteRule (.*) public/$1 [L]
 </IfModule>
+
+# Defensa adicional si mod_rewrite no estuviera activo (AllowOverride limitado, etc.):
+# bloquea directamente cualquier .sql servido desde cualquier subcarpeta.
+<FilesMatch "\.sql$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Defensa adicional, independiente de mod_rewrite, para app/, database/, storage/ y
+# .git/: los RewriteRule de arriba ya bloquean estas rutas cuando mod_rewrite SÍ está
+# activo, pero viven dentro de <IfModule mod_rewrite.c> y no protegen nada si ese
+# módulo no está cargado (ver nota al inicio de este archivo). <If> es un directivo
+# de core (Apache 2.4+), no depende de mod_rewrite, y usa el mismo patrón
+# Require all denied / Deny from all ya usado en storage/arqueos/.htaccess.
+<If "%{REQUEST_URI} =~ m#^/(app|database|storage)(/|$)#i || %{REQUEST_URI} =~ m#^/\.git(/|$)#i">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Deny from all
+    </IfModule>
+</If>

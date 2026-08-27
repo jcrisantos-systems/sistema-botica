@@ -4,9 +4,11 @@
             <h1 class="page-title">Proveedores</h1>
             <div class="page-subtitle">Gestiona la base de datos de proveedores para compras.</div>
         </div>
+        <?php if($_SESSION['rol_id'] == 1): ?>
         <button class="btn-primary-custom" style="width: auto; padding: 10px 20px;" data-bs-toggle="modal" data-bs-target="#modalProveedor" onclick="nuevoRegistro()">
             <i class="bi bi-truck"></i> Nuevo Proveedor
         </button>
+        <?php endif; ?>
     </div>
 
     <div class="card-metric">
@@ -34,6 +36,7 @@
                         <td><?php echo htmlspecialchars($prov['telefono'] ?? ''); ?></td>
                         <td><?php echo htmlspecialchars($prov['direccion'] ?? ''); ?></td>
                         <td class="text-end">
+                            <?php if($_SESSION['rol_id'] == 1): ?>
                             <button class="btn btn-sm" style="color: var(--accent-primary);" onclick="editarRegistro(<?php echo htmlspecialchars(json_encode($prov)); ?>)">
                                 <i class="bi bi-pencil-square"></i>
                             </button>
@@ -43,6 +46,7 @@
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php endforeach; ?>

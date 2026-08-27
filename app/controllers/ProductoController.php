@@ -2,22 +2,21 @@
 class ProductoController extends Controller {
 
     public function __construct() {
-        // Solo administradores gestionan el catálogo maestro
-        $this->requireAdmin();
+        // Permisos específicos por método (ver cada uno más abajo).
     }
 
     public function index() {
-        if (!isset($_SESSION['user_id'])) { header('Location: ' . BASE_URL . 'auth/login'); exit; }
-        
+        $this->requireRole([1, 2, 4]);
+
         $modelo = $this->model('Producto');
         $productos = $modelo->getAllAdmin();
-        
+
         $this->view('productos/index', ['title' => 'Productos', 'productos' => $productos]);
     }
 
     public function create() {
-        if (!isset($_SESSION['user_id'])) { header('Location: ' . BASE_URL . 'auth/login'); exit; }
-        
+        $this->requireAdmin();
+
         // Cargar combos para el formulario
         $catModel = $this->model('Categoria');
         $labModel = $this->model('Laboratorio');
@@ -33,8 +32,8 @@ class ProductoController extends Controller {
     }
     
     public function edit($id) {
-        if (!isset($_SESSION['user_id'])) { header('Location: ' . BASE_URL . 'auth/login'); exit; }
-        
+        $this->requireRole([1, 2, 4]);
+
         $modelo = $this->model('Producto');
         $catModel = $this->model('Categoria');
         $labModel = $this->model('Laboratorio');
@@ -50,12 +49,12 @@ class ProductoController extends Controller {
     }
 
     public function save() {
-        if (!isset($_SESSION['user_id'])) { header('Location: ' . BASE_URL . 'auth/login'); exit; }
+        $this->requireRole([1, 2, 4]);
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $this->verifyCsrf();
             $modelo = $this->model('Producto');
-            
+
             $data = [
                 'codigo_barras' => $_POST['codigo_barras'] ?: null,
                 'nombre_generico' => $_POST['nombre_generico'],
@@ -76,7 +75,24 @@ class ProductoController extends Controller {
                 'precio_fraccion' => isset($_POST['fraccionable']) && !empty($_POST['precio_fraccion']) ? $_POST['precio_fraccion'] : 0.00,
                 'id' => $_POST['id'] ?? null
             ];
-            
+
+            // Solo Administrador puede crear productos nuevos y solo Administrador puede
+            // modificar el precio de venta. Se refuerza aquí en el backend (no solo en la
+            // UI) porque $data llega directo de $_POST sin distinción de origen.
+            $precioVentaIgnorado = false;
+            if (($_SESSION['rol_id'] ?? null) != 1) {
+                if (empty($data['id'])) {
+                    $this->flash('error', 'No tienes permiso para crear productos nuevos.');
+                    header('Location: ' . BASE_URL . 'producto/index');
+                    exit;
+                }
+                $productoActual = $modelo->getById($data['id']);
+                if ((float)$data['precio_venta'] !== (float)$productoActual['precio_venta']) {
+                    $precioVentaIgnorado = true;
+                }
+                $data['precio_venta'] = $productoActual['precio_venta'];
+            }
+
             try {
                 if (empty($data['id'])) {
                     $modelo->create($data);
@@ -85,7 +101,11 @@ class ProductoController extends Controller {
                 } else {
                     $modelo->update($data);
                     $this->logAccion('Productos', 'EDITAR', "Producto ID #" . $data['id'] . " editado. Precios: S/ " . $data['precio_venta'] . " (Caja) / S/ " . $data['precio_fraccion'] . " (Frac)");
-                    $this->flash('success', "Producto actualizado exitosamente.");
+                    if ($precioVentaIgnorado) {
+                        $this->flash('success', "Producto actualizado exitosamente. El precio de venta no fue modificado (solo Administrador puede cambiarlo).");
+                    } else {
+                        $this->flash('success', "Producto actualizado exitosamente.");
+                    }
                 }
             } catch (PDOException $e) {
                 $this->flash('error', $this->handleDbException($e, ['codigo_barras' => 'código de barras']));
@@ -96,7 +116,7 @@ class ProductoController extends Controller {
     }
 
     public function toggle($id) {
-        if (!isset($_SESSION['user_id'])) { header('Location: ' . BASE_URL . 'auth/login'); exit; }
+        $this->requireRole([1, 2, 4]);
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') { header('Location: ' . BASE_URL . 'producto/index'); exit; }
         $this->verifyCsrf();
 

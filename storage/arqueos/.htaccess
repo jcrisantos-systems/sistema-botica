@@ -1,0 +1,9 @@
+# Defensa en profundidad: este directorio ya está fuera de public/ (la única raíz
+# servida por Apache según .htaccess de la raíz del proyecto), pero por si la
+# configuración del servidor cambiara, se deniega también explícitamente el acceso.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Deny from all
+</IfModule>

@@ -53,6 +53,24 @@ class User {
         return $stmt->rowCount() > 0;
     }
 
+    // Verifica si ya existe otro usuario con ese correo, normalizando mayúsculas/minúsculas
+    // y espacios (columna sin UNIQUE en BD todavía; único control hasta la Fase F).
+    // $excludeId permite ignorar el propio registro al editar.
+    public function existeEmail($email, $excludeId = null) {
+        $query = "SELECT 1 FROM " . $this->table_name . " WHERE LOWER(TRIM(email)) = LOWER(TRIM(:email))";
+        if ($excludeId !== null) {
+            $query .= " AND id != :id";
+        }
+        $query .= " LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':email', $email);
+        if ($excludeId !== null) {
+            $stmt->bindParam(':id', $excludeId);
+        }
+        $stmt->execute();
+        return $stmt->fetchColumn() !== false;
+    }
+
     public function getById($id) {
         $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id LIMIT 0,1";
         $stmt = $this->conn->prepare($query);

@@ -6,7 +6,9 @@ class AuthController extends Controller {
             header('Location: ' . BASE_URL . 'auth/login');
             exit;
         }
-        if ($_SESSION['rol_id'] == 2) {
+        // Cajero (rol_id = 3): "Acceso al Punto de Venta (POS) únicamente" según la
+        // descripción real del rol en la tabla `roles` de la BD.
+        if ($_SESSION['rol_id'] == 3) {
             header('Location: ' . BASE_URL . 'venta/pos');
         } else {
             header('Location: ' . BASE_URL . 'dashboard/index');

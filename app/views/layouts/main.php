@@ -37,13 +37,14 @@
             <?php endif; ?>
         </a>
         <ul class="sidebar-nav">
-            <?php if($_SESSION['rol_id'] == 1): ?>
+            <?php if(in_array($_SESSION['rol_id'], [1, 2, 3, 4])): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>dashboard/index" class="nav-link">
                     <i class="bi bi-grid-1x2-fill"></i> Dashboard
                 </a>
             </li>
             <?php endif; ?>
+            <?php if(in_array($_SESSION['rol_id'], [1, 2, 3])): ?>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menuCaja" role="button" aria-expanded="false" aria-controls="menuCaja" style="color: #ff9800;">
                     <i class="bi bi-box-arrow-in-right"></i> Gestión de Caja
@@ -61,6 +62,10 @@
                         <li class="nav-item">
                             <a href="<?php echo BASE_URL; ?>caja/index" class="nav-link"><i class="bi bi-circle"></i> Historial Arqueos</a>
                         </li>
+                        <?php else: ?>
+                        <li class="nav-item">
+                            <a href="<?php echo BASE_URL; ?>caja/historial_propio" class="nav-link"><i class="bi bi-circle"></i> Historial Arqueos</a>
+                        </li>
                         <?php endif; ?>
                     </ul>
                 </div>
@@ -70,23 +75,34 @@
                     <i class="bi bi-cart-fill"></i> PUNTO DE VENTA (POS)
                 </a>
             </li>
+            <?php endif; ?>
+            <?php if(in_array($_SESSION['rol_id'], [1, 2])): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>venta/index" class="nav-link">
                     <i class="bi bi-receipt"></i> Historial Ventas
                 </a>
             </li>
+            <?php elseif($_SESSION['rol_id'] == 3): ?>
+            <li class="nav-item">
+                <a href="<?php echo BASE_URL; ?>venta/historial_propio" class="nav-link">
+                    <i class="bi bi-receipt"></i> Historial Ventas
+                </a>
+            </li>
+            <?php endif; ?>
+            <?php if(in_array($_SESSION['rol_id'], [1, 2, 3])): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>cliente/index" class="nav-link">
                     <i class="bi bi-people"></i> Clientes
                 </a>
             </li>
+            <?php endif; ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>importacion/index" class="nav-link">
                     <i class="bi bi-cloud-upload-fill"></i> Importación Masiva
                 </a>
             </li>
 
-            <?php if($_SESSION['rol_id'] == 1): ?>
+            <?php if(in_array($_SESSION['rol_id'], [1, 2, 4])): ?>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menuProductos" role="button" aria-expanded="false" aria-controls="menuProductos">
                     <i class="bi bi-box-seam"></i> Catálogo Maestro
@@ -94,28 +110,40 @@
                 </a>
                 <div class="collapse" id="menuProductos">
                     <ul class="nav flex-column ms-3 mt-1" style="font-size: 13px;">
+                        <?php if(in_array($_SESSION['rol_id'], [1, 2, 4])): ?>
                         <li class="nav-item">
                             <a href="<?php echo BASE_URL; ?>producto/index" class="nav-link"><i class="bi bi-circle"></i> Productos</a>
                         </li>
+                        <?php endif; ?>
+                        <?php if(in_array($_SESSION['rol_id'], [1, 4])): ?>
                         <li class="nav-item">
                             <a href="<?php echo BASE_URL; ?>categoria/index" class="nav-link"><i class="bi bi-circle"></i> Categorías</a>
                         </li>
+                        <?php endif; ?>
+                        <?php if(in_array($_SESSION['rol_id'], [1, 4])): ?>
                         <li class="nav-item">
                             <a href="<?php echo BASE_URL; ?>laboratorio/index" class="nav-link"><i class="bi bi-circle"></i> Laboratorios</a>
                         </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </li>
+            <?php endif; ?>
+            <?php if(in_array($_SESSION['rol_id'], [1, 4])): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>compra/index" class="nav-link">
                     <i class="bi bi-cart"></i> Compras
                 </a>
             </li>
+            <?php endif; ?>
+            <?php if(in_array($_SESSION['rol_id'], [1, 4])): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>proveedor/index" class="nav-link">
                     <i class="bi bi-truck"></i> Proveedores
                 </a>
             </li>
+            <?php endif; ?>
+            <?php if(in_array($_SESSION['rol_id'], [1, 4])): ?>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menuInventario" role="button" aria-expanded="false" aria-controls="menuInventario">
                     <i class="bi bi-clipboard-data"></i> Inventario
@@ -135,6 +163,8 @@
                     </ul>
                 </div>
             </li>
+            <?php endif; ?>
+            <?php if($_SESSION['rol_id'] == 1): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>notificacion/index" class="nav-link">
                     <i class="bi bi-bell"></i> Alertas Sanitarias

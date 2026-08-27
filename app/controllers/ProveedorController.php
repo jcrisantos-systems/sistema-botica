@@ -2,10 +2,12 @@
 class ProveedorController extends Controller {
 
     public function __construct() {
-        $this->requireAdmin();
+        // Permisos específicos por método (ver cada uno más abajo).
     }
 
     public function index() {
+        $this->requireRole([1, 4]);
+
         $modelo = $this->model('Proveedor');
         $proveedores = $modelo->getAll();
 
@@ -13,6 +15,8 @@ class ProveedorController extends Controller {
     }
 
     public function save() {
+        $this->requireAdmin();
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $this->verifyCsrf();
             $modelo = $this->model('Proveedor');
@@ -42,6 +46,7 @@ class ProveedorController extends Controller {
     }
 
     public function delete($id) {
+        $this->requireAdmin();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') { header('Location: ' . BASE_URL . 'proveedor/index'); exit; }
         $this->verifyCsrf();
 
