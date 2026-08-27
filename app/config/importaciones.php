@@ -11,7 +11,7 @@ return [
     'categorias' => [
         'label' => 'Categorías',
         'tabla' => 'categorias',
-        'solo_admin' => true,
+        'roles_permitidos' => [1, 4],
         'clave_natural' => 'nombre',
         'columnas' => [
             'nombre'      => ['requerido' => true],
@@ -22,7 +22,7 @@ return [
     'laboratorios' => [
         'label' => 'Laboratorios',
         'tabla' => 'laboratorios',
-        'solo_admin' => true,
+        'roles_permitidos' => [1, 4],
         'clave_natural' => 'nombre',
         'columnas' => [
             'nombre'      => ['requerido' => true],
@@ -33,7 +33,7 @@ return [
     'proveedores' => [
         'label' => 'Proveedores',
         'tabla' => 'proveedores',
-        'solo_admin' => true,
+        'roles_permitidos' => [1],
         'clave_natural' => 'ruc',
         'columnas' => [
             'ruc'           => ['requerido' => true],
@@ -47,7 +47,7 @@ return [
     'clientes' => [
         'label' => 'Clientes',
         'tabla' => 'clientes',
-        'solo_admin' => false, // cualquier usuario logueado puede registrar clientes (igual que el alta 1 a 1)
+        'roles_permitidos' => [1, 2, 3], // Admin, Farmacéutico, Cajero (igual que el alta 1 a 1)
         'clave_natural' => 'num_documento',
         'columnas' => [
             'tipo_documento' => ['requerido' => true, 'enum' => ['DNI', 'RUC', 'Sin Documento']],
@@ -61,7 +61,7 @@ return [
     'productos' => [
         'label' => 'Productos',
         'tabla' => 'productos',
-        'solo_admin' => true,
+        'roles_permitidos' => [1],
         'clave_natural' => 'codigo_barras',
         'columnas' => [
             'codigo_barras'      => ['requerido' => false],
@@ -86,7 +86,7 @@ return [
     'inventario' => [
         'label' => 'Inventario (Ingreso de Stock)',
         'tabla' => null,
-        'solo_admin' => true,
+        'roles_permitidos' => [1, 4],
         'clave_natural' => null,
         'columnas' => [
             'codigo_barras'     => ['requerido' => true, 'fk' => ['tabla' => 'productos', 'buscar_por' => 'codigo_barras', 'columna_id' => 'id_producto']],

@@ -20,11 +20,12 @@ class ImportacionController extends Controller {
         return $configs[$entidadKey] ?? null;
     }
 
-    // Corta la ejecución si el rol actual no puede importar esta entidad
-    // (algunas, como Productos o Proveedores, son solo para Administrador;
-    // Clientes está abierta a cualquier usuario logueado, igual que el alta 1 a 1).
+    // Corta la ejecución si el rol actual no puede importar esta entidad. Cada entidad
+    // declara su propia lista de roles permitidos en 'roles_permitidos' (ver
+    // app/config/importaciones.php); p.ej. Productos/Proveedores son solo Administrador,
+    // mientras que Clientes admite Admin/Farmacéutico/Cajero (igual que el alta 1 a 1).
     private function verificarPermiso($config) {
-        if (!empty($config['solo_admin']) && ($_SESSION['rol_id'] ?? null) != 1) {
+        if (!in_array($_SESSION['rol_id'] ?? null, $config['roles_permitidos'] ?? [1])) {
             $this->flash('error', "No tienes permiso para importar esta información.");
             header('Location: ' . BASE_URL . 'importacion/index');
             exit;
@@ -34,7 +35,7 @@ class ImportacionController extends Controller {
     public function index() {
         $configs = $this->configuraciones();
         $disponibles = array_filter($configs, function ($c) {
-            return empty($c['solo_admin']) || ($_SESSION['rol_id'] ?? null) == 1;
+            return in_array($_SESSION['rol_id'] ?? null, $c['roles_permitidos'] ?? [1]);
         });
 
         $this->view('importacion/index', [
