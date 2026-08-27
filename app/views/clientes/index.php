@@ -41,12 +41,14 @@
                             <button class="btn btn-sm" style="color: var(--accent-primary);" onclick="editarRegistro(<?php echo htmlspecialchars(json_encode($cli)); ?>)">
                                 <i class="bi bi-pencil-square"></i>
                             </button>
+                            <?php if($_SESSION['rol_id'] == 1): ?>
                             <form action="<?php echo BASE_URL; ?>cliente/delete/<?php echo $cli['id']; ?>" method="POST" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar el registro?');">
                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
                                 <button type="submit" class="btn btn-sm" style="color: var(--danger);">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
+                            <?php endif; ?>
                             <?php endif; ?>
                         </td>
                     </tr>

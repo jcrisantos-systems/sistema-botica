@@ -147,7 +147,10 @@
                     </div>
                     <div class="form-group mb-0">
                         <label class="form-label" style="color: var(--accent-primary);">Precio Venta Sugerido (S/)</label>
-                        <input type="number" step="0.01" class="form-control-custom" name="precio_venta" id="pVenta" value="<?php echo $p ? $p['precio_venta'] : '0.00'; ?>" style="border-color: var(--accent-primary); font-size: 18px; font-weight: 700;" required>
+                        <input type="number" step="0.01" class="form-control-custom" name="precio_venta" id="pVenta" value="<?php echo $p ? $p['precio_venta'] : '0.00'; ?>" style="border-color: var(--accent-primary); font-size: 18px; font-weight: 700; <?php echo ($_SESSION['rol_id'] != 1) ? 'background-color: var(--border-color); cursor: not-allowed;' : ''; ?>" <?php echo ($_SESSION['rol_id'] != 1) ? 'readonly' : ''; ?> required>
+                        <?php if($_SESSION['rol_id'] != 1): ?>
+                        <small style="color:var(--text-secondary); font-size: 11px;">Solo Administrador puede modificar este valor.</small>
+                        <?php endif; ?>
                     </div>
                 </div>
 

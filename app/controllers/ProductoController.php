@@ -79,6 +79,7 @@ class ProductoController extends Controller {
             // Solo Administrador puede crear productos nuevos y solo Administrador puede
             // modificar el precio de venta. Se refuerza aquí en el backend (no solo en la
             // UI) porque $data llega directo de $_POST sin distinción de origen.
+            $precioVentaIgnorado = false;
             if (($_SESSION['rol_id'] ?? null) != 1) {
                 if (empty($data['id'])) {
                     $this->flash('error', 'No tienes permiso para crear productos nuevos.');
@@ -86,6 +87,9 @@ class ProductoController extends Controller {
                     exit;
                 }
                 $productoActual = $modelo->getById($data['id']);
+                if ((float)$data['precio_venta'] !== (float)$productoActual['precio_venta']) {
+                    $precioVentaIgnorado = true;
+                }
                 $data['precio_venta'] = $productoActual['precio_venta'];
             }
 
@@ -97,7 +101,11 @@ class ProductoController extends Controller {
                 } else {
                     $modelo->update($data);
                     $this->logAccion('Productos', 'EDITAR', "Producto ID #" . $data['id'] . " editado. Precios: S/ " . $data['precio_venta'] . " (Caja) / S/ " . $data['precio_fraccion'] . " (Frac)");
-                    $this->flash('success', "Producto actualizado exitosamente.");
+                    if ($precioVentaIgnorado) {
+                        $this->flash('success', "Producto actualizado exitosamente. El precio de venta no fue modificado (solo Administrador puede cambiarlo).");
+                    } else {
+                        $this->flash('success', "Producto actualizado exitosamente.");
+                    }
                 }
             } catch (PDOException $e) {
                 $this->flash('error', $this->handleDbException($e, ['codigo_barras' => 'código de barras']));

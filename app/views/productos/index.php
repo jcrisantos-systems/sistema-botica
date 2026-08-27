@@ -4,9 +4,11 @@
             <h1 class="page-title">Catálogo de Productos</h1>
             <div class="page-subtitle">Gestiona medicamentos, equipos e insumos de la botica.</div>
         </div>
+        <?php if($_SESSION['rol_id'] == 1): ?>
         <a href="<?php echo BASE_URL; ?>producto/create" class="btn-primary-custom" style="width: auto; padding: 10px 20px; text-decoration: none; display: inline-block;">
             <i class="bi bi-plus-lg"></i> Nuevo Producto
         </a>
+        <?php endif; ?>
     </div>
 
     <div class="card-metric mb-3 p-3">
