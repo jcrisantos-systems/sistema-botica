@@ -416,4 +416,19 @@ class Venta {
             return false;
         }
     }
+
+    public function getMetricasHoyPorUsuario($usuario_id) {
+        $hoy = date('Y-m-d');
+
+        $stmt = $this->conn->prepare("SELECT SUM(total) as ingresos, COUNT(id) as transacciones FROM ventas WHERE DATE(fecha_venta) = :hoy AND estado = 'Completada' AND id_usuario = :usuario_id");
+        $stmt->bindParam(':hoy', $hoy);
+        $stmt->bindParam(':usuario_id', $usuario_id);
+        $stmt->execute();
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return [
+            'transacciones' => $data['transacciones'] ?: 0,
+            'ingresos' => $data['ingresos'] ?: 0.00
+        ];
+    }
 }

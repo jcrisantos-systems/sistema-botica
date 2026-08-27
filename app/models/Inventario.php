@@ -48,7 +48,17 @@ class Inventario {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
+    public function getProductosBajoStockMinimo() {
+        $query = "SELECT id, nombre_comercial as producto, stock_actual as stock, stock_minimo, unidad_medida
+                  FROM productos
+                  WHERE stock_actual <= stock_minimo AND estado = 1
+                  ORDER BY stock_actual ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getKardex($id_producto = null) {
         $query = "SELECT k.*, p.nombre_comercial, u.nombres as usuario 
                   FROM kardex k
