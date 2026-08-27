@@ -142,6 +142,7 @@
                 </a>
             </li>
             <?php endif; ?>
+            <?php if($_SESSION['rol_id'] == 1): ?>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menuInventario" role="button" aria-expanded="false" aria-controls="menuInventario">
                     <i class="bi bi-clipboard-data"></i> Inventario
