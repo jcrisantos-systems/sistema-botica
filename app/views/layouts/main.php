@@ -128,6 +128,7 @@
                     </ul>
                 </div>
             </li>
+            <?php endif; ?>
             <?php if(in_array($_SESSION['rol_id'], [1, 4])): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>compra/index" class="nav-link">
