@@ -128,16 +128,20 @@
                     </ul>
                 </div>
             </li>
+            <?php if(in_array($_SESSION['rol_id'], [1, 4])): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>compra/index" class="nav-link">
                     <i class="bi bi-cart"></i> Compras
                 </a>
             </li>
+            <?php endif; ?>
+            <?php if(in_array($_SESSION['rol_id'], [1, 4])): ?>
             <li class="nav-item">
                 <a href="<?php echo BASE_URL; ?>proveedor/index" class="nav-link">
                     <i class="bi bi-truck"></i> Proveedores
                 </a>
             </li>
+            <?php endif; ?>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menuInventario" role="button" aria-expanded="false" aria-controls="menuInventario">
                     <i class="bi bi-clipboard-data"></i> Inventario
